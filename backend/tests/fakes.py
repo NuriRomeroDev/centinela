@@ -11,6 +11,9 @@ class FakeConnection:
     async def execute(self, statement):  # noqa: ARG002 — statement unused in fake
         return None
 
+    async def commit(self) -> None:
+        """No-op: the fake probe transaction needs no real commit."""
+
     async def close(self) -> None:
         self.closed = True
         self.engine.closed_connections.append(self)

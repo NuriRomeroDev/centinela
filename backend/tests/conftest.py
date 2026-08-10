@@ -8,7 +8,8 @@ import pytest
 import pytest_asyncio
 from alembic import command
 from alembic.config import Config as AlembicConfig
-from sqlalchemy import text
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -74,3 +75,52 @@ async def db_session(db_engine: AsyncEngine):
         )
         await session.commit()
         yield session
+
+
+# --- Batch 2 API fixtures (T2.1+) -------------------------------------------
+
+
+@pytest_asyncio.fixture
+async def clean_db(db_engine: AsyncEngine):
+    """Truncate every table so each API test starts from an empty database."""
+    factory = async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
+    async with factory() as session:
+        await session.execute(
+            text(f"TRUNCATE {', '.join(ALL_TABLES)} RESTART IDENTITY CASCADE")
+        )
+        await session.commit()
+
+
+def _build_test_app(db_engine: AsyncEngine):
+    """App bound to the testcontainer engine (settings only used for retry env)."""
+    from app.core.settings import Settings
+    from app.main import create_app
+
+    return create_app(Settings(_env_file=None), engine=db_engine)
+
+
+@pytest_asyncio.fixture
+async def api_client(db_engine: AsyncEngine, clean_db):
+    """httpx AsyncClient over the real app wired to the testcontainer DB."""
+    app = _build_test_app(db_engine)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        yield client
+
+
+@pytest_asyncio.fixture
+async def api_app(db_engine: AsyncEngine, clean_db):
+    """The raw FastAPI app (for tests that need the app object, e.g. engine patching)."""
+    return _build_test_app(db_engine)
+
+
+@pytest_asyncio.fixture
+async def query_counter(db_engine: AsyncEngine):
+    """SQLAlchemy statement counter (before_cursor_execute) for N+1 assertions."""
+    counter = {"statements": 0}
+
+    def _before_cursor_execute(*_args, **_kwargs) -> None:  # noqa: ANN002, ANN003
+        counter["statements"] += 1
+
+    event.listen(db_engine.sync_engine, "before_cursor_execute", _before_cursor_execute)
+    yield counter
+    event.remove(db_engine.sync_engine, "before_cursor_execute", _before_cursor_execute)
