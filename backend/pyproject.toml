@@ -38,6 +38,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
 addopts = "--cov=app --cov-report=term-missing"
 # NOTE: the 80% coverage gate (--cov-fail-under=80) is enforced by scripts/test.sh
 # and the Jenkinsfile (Batch 4) — not baked into addopts so per-task TDD cycles
