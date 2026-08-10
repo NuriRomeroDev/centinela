@@ -1,0 +1,16 @@
+# Local SDD cache (skill registry, atl artifacts)
+.atl/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Environment
+.env
+.env.local
