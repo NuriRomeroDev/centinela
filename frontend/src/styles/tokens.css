@@ -1,0 +1,262 @@
+:root {
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --bg: oklch(97.3% 0.004 250);
+  --sidebar-bg: oklch(23% 0.045 255);
+  --sidebar-divider: oklch(100% 0 0 / 0.09);
+  --sidebar-brand: oklch(96% 0.004 250);
+  --sidebar-sub: oklch(58% 0.03 250);
+  --sidebar-foot-bg: oklch(100% 0 0 / 0.04);
+  --nav-text: oklch(70% 0.025 250);
+  --nav-active-bg: oklch(60% 0.09 250 / 0.18);
+  --nav-active-text: oklch(85% 0.04 250);
+  --accent: oklch(42% 0.11 255);
+  --on-accent: oklch(99% 0.002 250);
+  --header-bg: oklch(99% 0.002 250);
+  --card-bg: oklch(99% 0.002 250);
+  --card-border: oklch(90% 0.006 250);
+  --row-border: oklch(93.5% 0.004 250);
+  --text-primary: oklch(22% 0.015 255);
+  --text-secondary: oklch(49% 0.015 255);
+  --track-bg: oklch(92.5% 0.006 250);
+  --tag-bg: oklch(94% 0.008 250);
+  --sub-row-bg: oklch(96% 0.004 250);
+  --toggle-track: oklch(92.5% 0.006 250);
+  --avatar-bg: oklch(23% 0.045 255);
+  --avatar-text: oklch(85% 0.04 250);
+  --trace-bg: oklch(23% 0.045 255);
+  --trace-text: oklch(85% 0.01 250);
+  --focus-ring: oklch(42% 0.11 255 / 0.18);
+  --overlay: rgba(15, 23, 42, 0.55);
+  --overlay-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  --delta-up: oklch(40% 0.1 155);
+  --delta-down: oklch(46% 0.16 25);
+  --rejected-bar: oklch(68% 0.13 25);
+  --env-dot: oklch(58% 0.1 155);
+}
+
+:root[data-theme='b'] {
+  --bg: oklch(17% 0.02 255);
+  --sidebar-bg: oklch(13% 0.022 255);
+  --sidebar-divider: oklch(100% 0 0 / 0.08);
+  --sidebar-brand: oklch(95% 0.004 255);
+  --sidebar-sub: oklch(58% 0.02 255);
+  --sidebar-foot-bg: oklch(100% 0 0 / 0.04);
+  --nav-text: oklch(65% 0.02 255);
+  --nav-active-bg: oklch(68% 0.14 250 / 0.2);
+  --nav-active-text: oklch(85% 0.06 250);
+  --accent: oklch(68% 0.14 250);
+  --on-accent: oklch(14% 0.02 255);
+  --header-bg: oklch(19% 0.02 255);
+  --card-bg: oklch(20% 0.02 255);
+  --card-border: oklch(28% 0.02 255);
+  --row-border: oklch(25% 0.02 255);
+  --text-primary: oklch(93% 0.004 255);
+  --text-secondary: oklch(64% 0.015 255);
+  --track-bg: oklch(24% 0.02 255);
+  --tag-bg: oklch(26% 0.02 255);
+  --sub-row-bg: oklch(22% 0.02 255);
+  --toggle-track: oklch(24% 0.02 255);
+  --avatar-bg: oklch(68% 0.14 250);
+  --avatar-text: oklch(14% 0.02 255);
+  --trace-bg: oklch(10% 0.02 255);
+  --trace-text: oklch(85% 0.01 255);
+  --focus-ring: oklch(68% 0.14 250 / 0.25);
+  --delta-up: oklch(62% 0.15 155);
+  --delta-down: oklch(64% 0.16 25);
+  --rejected-bar: oklch(68% 0.13 25);
+}
+
+.p-inputtext {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.p-inputtext:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+  outline: none;
+}
+
+.p-dialog-mask {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: overlayIn 0.15s ease;
+}
+
+.p-dialog {
+  width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-radius: 14px;
+  box-shadow: var(--overlay-shadow);
+  overflow: hidden;
+}
+
+.p-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.p-dialog-title {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.p-dialog-content {
+  padding: 20px 22px;
+  overflow-y: auto;
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.p-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--card-border);
+}
+
+.p-dialog .p-dialog-header-close {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-dialog .p-dialog-header-close:hover {
+  background: var(--track-bg);
+}
+
+.p-datatable {
+  background: var(--card-bg);
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--track-bg);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--card-border);
+  padding: 13px 18px;
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--row-border);
+  cursor: pointer;
+}
+
+.p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background: var(--sub-row-bg);
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--track-bg);
+}
+
+.p-datatable .p-row-expansion {
+  background: var(--sub-row-bg);
+  padding: 14px 18px 18px 46px;
+  cursor: default;
+}
+
+.p-datatable .p-row-toggler {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.p-datatable .p-row-toggler.p-row-toggler-open {
+  transform: rotate(90deg);
+}
+
+.p-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-family: var(--font-sans);
+}
+
+.p-virtualscroller {
+  position: relative;
+  overflow-y: auto;
+}
+
+.p-virtualscroller-spacer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.p-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.p-toast .p-toast-message {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: var(--overlay-shadow);
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 280px;
+}
+
+.p-toast .p-toast-message-success {
+  border-left: 3px solid var(--delta-up);
+}
+
+.p-toast .p-toast-message-error {
+  border-left: 3px solid var(--delta-down);
+}
+
+.p-chart {
+  position: relative;
+}
+
+.p-chart canvas {
+  display: block;
+}
