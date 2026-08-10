@@ -99,6 +99,10 @@ async def _http_exception_handler(request: Request, exc: HTTPException) -> JSONR
     )
 
 
+async def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 def _register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _app_error_handler)
     app.add_exception_handler(RequestValidationError, _validation_error_handler)
@@ -113,6 +117,7 @@ def create_app(settings: Settings | None = None, *, engine: AsyncEngine | None =
     app = FastAPI(title=conf.app_name, version="0.1.0", lifespan=lifespan)
     app.state.engine = eng
     app.state.session_factory = async_sessionmaker(eng, class_=AsyncSession, expire_on_commit=False)
+    app.add_api_route("/health", health, methods=["GET"])
     app.add_middleware(
         CORSMiddleware,
         allow_origins=conf.cors_origins,

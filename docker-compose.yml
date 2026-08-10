@@ -1,0 +1,76 @@
+name: centinela
+
+networks:
+  frontend-net:
+    driver: bridge
+  db-net:
+    driver: bridge
+
+volumes:
+  pgdata:
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-centinela}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-centinela}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    networks:
+      - db-net
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-centinela}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:5173"]}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-20}
+      DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
+      DB_POOL_TIMEOUT: ${DB_POOL_TIMEOUT:-5.0}
+      DB_POOL_PRE_PING: ${DB_POOL_PRE_PING:-true}
+      DB_RETRY_INITIAL_BACKOFF: ${DB_RETRY_INITIAL_BACKOFF:-0.5}
+      DB_RETRY_MAX_ATTEMPTS: ${DB_RETRY_MAX_ATTEMPTS:-3}
+      DB_RETRY_JITTER: ${DB_RETRY_JITTER:-0.25}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    networks:
+      - frontend-net
+      - db-net
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    networks:
+      - frontend-net
