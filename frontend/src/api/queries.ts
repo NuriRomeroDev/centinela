@@ -40,6 +40,22 @@ export function useRecentLogs(limit = 5) {
   })
 }
 
+export function useLogs(search: string, page: number, pageSize = 25) {
+  return useQuery({
+    queryKey: ['logs', search, page, pageSize],
+    queryFn: () =>
+      api.logs({ search: search || undefined, page, page_size: pageSize }),
+  })
+}
+
+export function useLogDetail(id: number | null) {
+  return useQuery({
+    queryKey: ['logs', 'detail', id],
+    queryFn: () => api.logDetail(id as number),
+    enabled: id !== null,
+  })
+}
+
 export function useSyncs() {
   return useQuery({
     queryKey: ['syncs'],

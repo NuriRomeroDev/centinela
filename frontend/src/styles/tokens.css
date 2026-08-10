@@ -33,6 +33,22 @@
   --delta-down: oklch(46% 0.16 25);
   --rejected-bar: oklch(68% 0.13 25);
   --env-dot: oklch(58% 0.1 155);
+  --level-warn-bg: oklch(90% 0.14 70);
+  --level-warn-text: oklch(46% 0.15 62);
+  --level-err-bg: oklch(89% 0.15 45);
+  --level-err-text: oklch(47% 0.19 40);
+  --level-crt-bg: oklch(90% 0.13 25);
+  --level-crt-text: oklch(47% 0.22 25);
+  --status-pending-bg: oklch(93% 0.008 255);
+  --status-pending-text: oklch(48% 0.02 255);
+  --status-running-bg: oklch(90% 0.09 252);
+  --status-running-text: oklch(46% 0.19 258);
+  --status-completed-bg: oklch(90% 0.11 155);
+  --status-completed-text: oklch(41% 0.16 155);
+  --status-failed-bg: oklch(91% 0.13 25);
+  --status-failed-text: oklch(48% 0.21 25);
+  --status-rejected-bg: oklch(90% 0.14 70);
+  --status-rejected-text: oklch(46% 0.15 62);
 }
 
 :root[data-theme='b'] {
@@ -65,6 +81,22 @@
   --delta-up: oklch(62% 0.15 155);
   --delta-down: oklch(64% 0.16 25);
   --rejected-bar: oklch(68% 0.13 25);
+  --level-warn-bg: oklch(40% 0.13 70);
+  --level-warn-text: oklch(95% 0.01 70);
+  --level-err-bg: oklch(40% 0.15 45);
+  --level-err-text: oklch(95% 0.01 45);
+  --level-crt-bg: oklch(40% 0.16 25);
+  --level-crt-text: oklch(95% 0.01 25);
+  --status-pending-bg: oklch(35% 0.03 255);
+  --status-pending-text: oklch(92% 0.01 255);
+  --status-running-bg: oklch(36% 0.1 252);
+  --status-running-text: oklch(92% 0.04 252);
+  --status-completed-bg: oklch(36% 0.12 155);
+  --status-completed-text: oklch(92% 0.03 155);
+  --status-failed-bg: oklch(36% 0.14 25);
+  --status-failed-text: oklch(92% 0.03 25);
+  --status-rejected-bg: oklch(36% 0.13 70);
+  --status-rejected-text: oklch(92% 0.03 70);
 }
 
 .p-inputtext {

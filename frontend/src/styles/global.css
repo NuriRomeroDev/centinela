@@ -541,3 +541,400 @@ body {
 .widget-state-retry:hover {
   background: var(--track-bg);
 }
+
+/* Logs screen */
+.logs-toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.logs-search {
+  position: relative;
+  flex: 1;
+  max-width: 420px;
+}
+
+.logs-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.logs-search .p-inputtext {
+  width: 100%;
+  padding-left: 36px;
+}
+
+.logs-count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.logs-busy {
+  animation: fadeIn 0.15s ease;
+}
+
+.logs-total {
+  font-family: var(--font-mono);
+}
+
+.logs-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.logs-header {
+  display: grid;
+  grid-template-columns: 90px 130px 1fr 120px 110px;
+  gap: 10px;
+  padding: 13px 18px;
+  background: var(--track-bg);
+  border-bottom: 1px solid var(--card-border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.logs-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 120px;
+  padding: 0 18px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.logs-state p {
+  margin: 0;
+}
+
+.logs-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  border-top: 1px solid var(--card-border);
+  background: var(--track-bg);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+.logs-footer-count b {
+  color: var(--text-primary);
+}
+
+.logs-footer-pages {
+  display: flex;
+  gap: 4px;
+}
+
+.page-square {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  cursor: pointer;
+}
+
+.page-square--active {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.page-square:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.virtual-list {
+  background: var(--card-bg);
+}
+
+.log-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: 90px 130px 1fr 120px 110px;
+  gap: 10px;
+  align-items: center;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--row-border);
+  cursor: pointer;
+}
+
+.log-row--odd {
+  background: var(--sub-row-bg);
+}
+
+.log-row--even {
+  background: var(--card-bg);
+}
+
+.log-row:hover {
+  background: var(--track-bg);
+}
+
+.log-code {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-message {
+  font-size: 12.5px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12px;
+}
+
+.log-servicio {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.log-time {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+}
+
+/* Level + status badges (D-4: A/B variants via tokens) */
+.level-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.level-badge--WARNING {
+  background: var(--level-warn-bg);
+  color: var(--level-warn-text);
+}
+
+.level-badge--ERROR {
+  background: var(--level-err-bg);
+  color: var(--level-err-text);
+}
+
+.level-badge--CRITICAL {
+  background: var(--level-crt-bg);
+  color: var(--level-crt-text);
+}
+
+.status-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.status-badge--pending {
+  background: var(--status-pending-bg);
+  color: var(--status-pending-text);
+}
+
+.status-badge--running {
+  background: var(--status-running-bg);
+  color: var(--status-running-text);
+}
+
+.status-badge--completed {
+  background: var(--status-completed-bg);
+  color: var(--status-completed-text);
+}
+
+.status-badge--failed {
+  background: var(--status-failed-bg);
+  color: var(--status-failed-text);
+}
+
+.status-badge--rejected {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+.status-badge--success {
+  background: var(--status-completed-bg);
+  color: var(--status-completed-text);
+}
+
+/* Stack trace modal */
+.stack-modal-mask {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: overlayIn 0.15s ease;
+}
+
+.stack-modal {
+  width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-radius: 14px;
+  box-shadow: var(--overlay-shadow);
+  overflow: hidden;
+}
+
+.stack-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.stack-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stack-modal-code {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.stack-modal-close {
+  border: none;
+  background: none;
+  font-size: 18px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+}
+
+.stack-modal-close:hover {
+  background: var(--track-bg);
+}
+
+.stack-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.stack-modal-message {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.stack-modal-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.stack-modal-meta-label {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+
+.stack-modal-meta-value {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.stack-modal-trace-label {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+
+.stack-modal-trace {
+  background: var(--trace-bg);
+  color: var(--trace-text);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  padding: 16px;
+  border-radius: 9px;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.stack-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--card-border);
+}
+
+.btn-ghost {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: var(--track-bg);
+}
+
+.btn-accent {
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-accent:hover {
+  filter: brightness(1.06);
+}
