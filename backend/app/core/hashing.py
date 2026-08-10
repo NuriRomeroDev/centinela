@@ -36,6 +36,4 @@ def sha256_hex(data: bytes) -> str:
 def verify_checksum(expected: str, actual: str) -> None:
     """Raise :class:`ChecksumMismatchError` when the digests differ."""
     if expected != actual:
-        raise ChecksumMismatchError(
-            f"Checksum mismatch: expected {expected} got {actual}"
-        )
+        raise ChecksumMismatchError(f"Checksum mismatch: expected {expected} got {actual}")

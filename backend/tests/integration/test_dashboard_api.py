@@ -8,13 +8,13 @@ Scenarios (dashboard-api spec R1–R5, tasks.md T2.4):
 - N+1: constant (bounded) SQL query count on a 1,000-row dataset
 """
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, timedelta
 
-from sqlalchemy import func, insert, select
+from sqlalchemy import insert
 
 from app.db.seed import seed
 from app.models import ArchivoProcesado, LogError, Sincronizacion
-from app.models.enums import ArchivoEstado, NivelError, SyncEstado, TipoArchivo
+from app.models.enums import ArchivoEstado, NivelError, SyncEstado
 from tests.integration.helpers import archivo_row, checksum, log_row, sync_row, utcnow
 
 METRICS_URL = "/api/v1/dashboard/metrics"
@@ -59,7 +59,9 @@ async def test_metrics_completadas_hoy_counts_today_only(api_client, db_session)
     completed_other_day = sync_row(estado=SyncEstado.completed, fecha=today - timedelta(days=2))
     running_today = sync_row(estado=SyncEstado.running, fecha=today)
     await _add_all(db_session, [completed_today, completed_other_day, running_today])
-    db_session.add_all([archivo_row(completed_today), archivo_row(running_today, estado=ArchivoEstado.rejected)])
+    db_session.add_all(
+        [archivo_row(completed_today), archivo_row(running_today, estado=ArchivoEstado.rejected)]
+    )
     await db_session.commit()
 
     body = (await api_client.get(METRICS_URL)).json()
@@ -72,10 +74,12 @@ async def test_metrics_tasa_errores_criticos_is_one_decimal(api_client, db_sessi
     syncs = [sync_row() for _ in range(2)]
     await _add_all(db_session, syncs)
     db_session.add_all(
-        [log_row(syncs[0], codigo="ERR_JSON_MALFORMED", nivel=NivelError.critical),
-         log_row(syncs[0], codigo="ERR_DB_TIMEOUT", nivel=NivelError.critical),
-         log_row(syncs[0], codigo="ERR_NETWORK_RESET", nivel=NivelError.error),
-         log_row(syncs[1], codigo="ERR_ORPHAN_RECORD", nivel=NivelError.error)]
+        [
+            log_row(syncs[0], codigo="ERR_JSON_MALFORMED", nivel=NivelError.critical),
+            log_row(syncs[0], codigo="ERR_DB_TIMEOUT", nivel=NivelError.critical),
+            log_row(syncs[0], codigo="ERR_NETWORK_RESET", nivel=NivelError.error),
+            log_row(syncs[1], codigo="ERR_ORPHAN_RECORD", nivel=NivelError.error),
+        ]
     )
     await db_session.commit()
 
@@ -114,7 +118,11 @@ async def test_throughput_returns_7_entries_oldest_to_newest_with_zero_fill(api_
 
     # sparse days are zero-filled; populated days carry correct counts
     by_day = {entry["fecha"]: entry for entry in entries}
-    assert by_day[today.isoformat()] == {"fecha": today.isoformat(), "aceptados": 2, "rechazados": 1}
+    assert by_day[today.isoformat()] == {
+        "fecha": today.isoformat(),
+        "aceptados": 2,
+        "rechazados": 1,
+    }
     assert by_day[(today - timedelta(days=3)).isoformat()] == {
         "fecha": (today - timedelta(days=3)).isoformat(),
         "aceptados": 1,
@@ -168,7 +176,13 @@ async def test_recent_logs_returns_newest_first_without_stack_trace(api_client, 
     await _add_all(db_session, [sync])
     base = utcnow()
     logs = [
-        log_row(sync, codigo=f"ERR_{i}", nivel=NivelError.error, stack=f"trace-{i}", creado=base - timedelta(minutes=i))
+        log_row(
+            sync,
+            codigo=f"ERR_{i}",
+            nivel=NivelError.error,
+            stack=f"trace-{i}",
+            creado=base - timedelta(minutes=i),
+        )
         for i in range(8)
     ]
     db_session.add_all(logs)
@@ -182,7 +196,13 @@ async def test_recent_logs_returns_newest_first_without_stack_trace(api_client, 
     assert [item["codigo_error"] for item in items] == [f"ERR_{i}" for i in range(5)]  # newest 5
     assert all("stack_trace" not in item for item in items)  # contract: no stack_trace
     assert set(items[0].keys()) == {
-        "id", "correlation_id", "nivel_error", "codigo_error", "mensaje", "servicio_responsable", "creado_at",
+        "id",
+        "correlation_id",
+        "nivel_error",
+        "codigo_error",
+        "mensaje",
+        "servicio_responsable",
+        "creado_at",
     }
 
 
@@ -197,7 +217,9 @@ async def test_recent_logs_limit_is_clamped_to_1_and_20(api_client, db_session):
     assert len((await api_client.get(RECENT_URL)).json()) == 5  # default limit
 
 
-async def test_dashboard_endpoints_are_n_plus_one_free_on_1000_rows(api_client, db_session, query_counter):
+async def test_dashboard_endpoints_are_n_plus_one_free_on_1000_rows(
+    api_client, db_session, query_counter
+):
     ids = [f"11111111-2222-3333-4444-{i:012d}" for i in range(1000)]
     syncs = [
         {

@@ -22,7 +22,6 @@ from app.models.enums import NivelError, SyncEstado
 
 logger = logging.getLogger(__name__)
 
-# codigo → (nivel_error, servicio_responsable) — mirrors seed LOG_DEFS (BE8).
 ERROR_LOG_META: dict[str, tuple[NivelError, str]] = {
     "ERR_CHECKSUM_MISMATCH": (NivelError.error, "API_Gateway"),
     "ERR_DB_TIMEOUT": (NivelError.critical, "DB_Connection_Pool"),
@@ -79,7 +78,7 @@ async def persist_error_log(
                 )
             )
             await session.commit()
-    except Exception:  # noqa: BLE001 — DB down etc.; surfaced via HTTP instead
+    except Exception:  # noqa: BLE001
         logger.exception(
             "failed to persist error log (codigo=%s correlation_id=%s)", codigo, correlation_id
         )

@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, Text, func, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.enums import NivelError, enum_values
+
+if TYPE_CHECKING:
+    from app.models.sincronizacion import Sincronizacion
 
 
 class LogError(Base):

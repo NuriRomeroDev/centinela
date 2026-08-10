@@ -1,4 +1,7 @@
-"""Syncs & remediations — server-side aggregates, N+1-free, remediation actions (syncs-api spec, tasks.md T2.9)."""
+"""Syncs & remediations — server-side aggregates, N+1-free, remediation actions.
+
+Spec: syncs-api, tasks.md T2.9.
+"""
 
 from __future__ import annotations
 
@@ -22,7 +25,9 @@ async def list_syncs(session: AsyncSession, *, include_files: bool) -> list[dict
     from loaded files. include_files=False adds one GROUP BY for the resumen —
     either way a constant number of statements.
     """
-    stmt = select(Sincronizacion).order_by(Sincronizacion.iniciado_at.desc(), Sincronizacion.id.desc())
+    stmt = select(Sincronizacion).order_by(
+        Sincronizacion.iniciado_at.desc(), Sincronizacion.id.desc()
+    )
     if include_files:
         stmt = stmt.options(selectinload(Sincronizacion.archivos))
     syncs = (await session.execute(stmt)).scalars().all()
@@ -31,7 +36,10 @@ async def list_syncs(session: AsyncSession, *, include_files: bool) -> list[dict
         return [
             _sync_item(
                 sync,
-                (len(sync.archivos), sum(1 for f in sync.archivos if f.estado == ArchivoEstado.rejected)),
+                (
+                    len(sync.archivos),
+                    sum(1 for f in sync.archivos if f.estado == ArchivoEstado.rejected),
+                ),
                 include_files=True,
             )
             for sync in syncs
@@ -52,7 +60,9 @@ async def list_syncs(session: AsyncSession, *, include_files: bool) -> list[dict
     return [_sync_item(sync, resumen.get(sync.id, (0, 0))) for sync in syncs]
 
 
-def _sync_item(sync: Sincronizacion, resumen: tuple[int, int], *, include_files: bool = False) -> dict:
+def _sync_item(
+    sync: Sincronizacion, resumen: tuple[int, int], *, include_files: bool = False
+) -> dict:
     total, rejected = resumen
     item = {
         "id": str(sync.id),
@@ -68,7 +78,11 @@ def _sync_item(sync: Sincronizacion, resumen: tuple[int, int], *, include_files:
         item["archivos"] = [
             {
                 "nombre_archivo": f.nombre_archivo,
-                "tipo_archivo": f.tipo_archivo.value if hasattr(f.tipo_archivo, "value") else str(f.tipo_archivo),
+                "tipo_archivo": (
+                    f.tipo_archivo.value
+                    if hasattr(f.tipo_archivo, "value")
+                    else str(f.tipo_archivo)
+                ),
                 "checksum": f.checksum,
                 "estado": f.estado.value if hasattr(f.estado, "value") else str(f.estado),
                 "registros_totales": f.registros_totales,
@@ -93,12 +107,16 @@ async def _resumen_for(session: AsyncSession, sync: Sincronizacion) -> tuple[int
 async def list_remediations(session: AsyncSession) -> list[dict]:
     """Remediation history newest-first with correlation_id via selectinload join."""
     rows = (
-        await session.execute(
-            select(AccionRemediacion)
-            .options(selectinload(AccionRemediacion.sincronizacion))
-            .order_by(AccionRemediacion.ejecutada_at.desc(), AccionRemediacion.id.desc())
+        (
+            await session.execute(
+                select(AccionRemediacion)
+                .options(selectinload(AccionRemediacion.sincronizacion))
+                .order_by(AccionRemediacion.ejecutada_at.desc(), AccionRemediacion.id.desc())
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return [_accion_item(row) for row in rows]
 
 
@@ -158,13 +176,17 @@ async def remediate(session: AsyncSession, *, sync_id: uuid.UUID, accion: str) -
         sync.finalizado_at = None
     elif accion == "FORCE_SKIP_VALIDATION":
         files = (
-            (await session.execute(select(ArchivoProcesado).where(ArchivoProcesado.sincronizacion_id == sync.id)))
+            (
+                await session.execute(
+                    select(ArchivoProcesado).where(ArchivoProcesado.sincronizacion_id == sync.id)
+                )
+            )
             .scalars()
             .all()
         )
         for file in files:
             file.estado = ArchivoEstado.accepted
-    else:  # guard; route Literal already rejects, keep service defensive
+    else:
         raise ValueError(f"unsupported remediation action: {accion}")
 
     session.add(

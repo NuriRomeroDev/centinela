@@ -15,7 +15,7 @@ def test_create_app_registers_cors_middleware_with_settings_origins():
 
 
 async def test_lifespan_probes_database_on_startup_and_disposes_on_shutdown(monkeypatch):
-    from app.main import create_app, lifespan
+    from app.main import create_app
 
     fake = FakeEngine()
     monkeypatch.setattr("app.main.get_engine", lambda: fake)

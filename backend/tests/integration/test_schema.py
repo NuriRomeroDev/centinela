@@ -40,8 +40,7 @@ async def test_catalog_has_4_tables(db_engine):
     async with db_engine.connect() as conn:
         rows = await conn.execute(
             text(
-                "SELECT table_name FROM information_schema.tables "
-                "WHERE table_schema = 'public'"
+                "SELECT table_name FROM information_schema.tables " "WHERE table_schema = 'public'"
             )
         )
     assert TABLES <= {row[0] for row in rows}
@@ -58,8 +57,13 @@ async def test_sincronizaciones_columns(db_engine):
         )
     cols = {row[0]: row for row in rows}
     assert set(cols) == {
-        "id", "correlation_id", "fecha_ejecucion", "estado",
-        "iniciado_at", "finalizado_at", "usuario_origen",
+        "id",
+        "correlation_id",
+        "fecha_ejecucion",
+        "estado",
+        "iniciado_at",
+        "finalizado_at",
+        "usuario_origen",
     }
     assert cols["id"][1] == "NO" and cols["id"][3] == "uuid"
     assert cols["finalizado_at"][1] == "YES"  # nullable
@@ -85,11 +89,16 @@ async def test_enums_created(db_engine):
         rows = await conn.execute(
             text(
                 "SELECT typname FROM pg_type "
-                "WHERE typname IN ('sync_estado','tipo_archivo','archivo_estado','nivel_error','resultado')"
+                "WHERE typname IN "
+                "('sync_estado','tipo_archivo','archivo_estado','nivel_error','resultado')"
             )
         )
     assert {row[0] for row in rows} == {
-        "sync_estado", "tipo_archivo", "archivo_estado", "nivel_error", "resultado",
+        "sync_estado",
+        "tipo_archivo",
+        "archivo_estado",
+        "nivel_error",
+        "resultado",
     }
 
 
@@ -151,16 +160,21 @@ async def test_unique_checksum_rejects_duplicate_at_db_level(db_session):
     await db_session.flush()
     db_session.add(
         ArchivoProcesado(
-            sincronizacion_id=sync.id, nombre_archivo="a.csv",
-            tipo_archivo=TipoArchivo.ventas, checksum="c" * 64,
-            estado=ArchivoEstado.accepted, registros_totales=1,
+            sincronizacion_id=sync.id,
+            nombre_archivo="a.csv",
+            tipo_archivo=TipoArchivo.ventas,
+            checksum="c" * 64,
+            estado=ArchivoEstado.accepted,
+            registros_totales=1,
         )
     )
     await db_session.flush()
     db_session.add(
         ArchivoProcesado(
-            sincronizacion_id=sync.id, nombre_archivo="b.csv",
-            tipo_archivo=TipoArchivo.inventario, checksum="c" * 64,
+            sincronizacion_id=sync.id,
+            nombre_archivo="b.csv",
+            tipo_archivo=TipoArchivo.inventario,
+            checksum="c" * 64,
             estado=ArchivoEstado.accepted,
         )
     )
@@ -184,18 +198,24 @@ async def test_cascade_delete_removes_dependents(db_session):
     db_session.add_all(
         [
             ArchivoProcesado(
-                sincronizacion_id=sync.id, nombre_archivo="a.csv",
-                tipo_archivo=TipoArchivo.ventas, checksum="a" * 64,
+                sincronizacion_id=sync.id,
+                nombre_archivo="a.csv",
+                tipo_archivo=TipoArchivo.ventas,
+                checksum="a" * 64,
                 estado=ArchivoEstado.rejected,
             ),
             LogError(
-                correlation_id=sync.correlation_id, servicio_responsable="API_Gateway",
-                nivel_error=NivelError.error, codigo_error="ERR_CHECKSUM_MISMATCH",
+                correlation_id=sync.correlation_id,
+                servicio_responsable="API_Gateway",
+                nivel_error=NivelError.error,
+                codigo_error="ERR_CHECKSUM_MISMATCH",
                 mensaje="mismatch",
             ),
             AccionRemediacion(
-                sincronizacion_id=sync.id, accion_ejecutada="RETRY_JOB",
-                ejecutado_por="svc.autoheal", resultado=Resultado.success,
+                sincronizacion_id=sync.id,
+                accion_ejecutada="RETRY_JOB",
+                ejecutado_por="svc.autoheal",
+                resultado=Resultado.success,
             ),
         ]
     )
@@ -212,8 +232,11 @@ async def test_defaults_applied_on_insert(db_session):
     db_session.add(sync)
     await db_session.flush()
     archivo = ArchivoProcesado(
-        sincronizacion_id=sync.id, nombre_archivo="a.csv",
-        tipo_archivo=TipoArchivo.ventas, checksum="d" * 64, estado=ArchivoEstado.accepted,
+        sincronizacion_id=sync.id,
+        nombre_archivo="a.csv",
+        tipo_archivo=TipoArchivo.ventas,
+        checksum="d" * 64,
+        estado=ArchivoEstado.accepted,
     )
     db_session.add(archivo)
     await db_session.flush()
@@ -222,12 +245,17 @@ async def test_defaults_applied_on_insert(db_session):
     assert sync.estado == SyncEstado.pending
     assert archivo.registros_totales == 0
     log = LogError(
-        correlation_id=sync.correlation_id, servicio_responsable="API_Gateway",
-        nivel_error=NivelError.warning, codigo_error="ERR_DUPLICATE_BATCH", mensaje="replay",
+        correlation_id=sync.correlation_id,
+        servicio_responsable="API_Gateway",
+        nivel_error=NivelError.warning,
+        codigo_error="ERR_DUPLICATE_BATCH",
+        mensaje="replay",
     )
     accion = AccionRemediacion(
-        sincronizacion_id=sync.id, accion_ejecutada="RETRY_JOB",
-        ejecutado_por="svc.autoheal", resultado=Resultado.success,
+        sincronizacion_id=sync.id,
+        accion_ejecutada="RETRY_JOB",
+        ejecutado_por="svc.autoheal",
+        resultado=Resultado.success,
     )
     db_session.add_all([log, accion])
     await db_session.flush()
@@ -238,8 +266,11 @@ async def test_defaults_applied_on_insert(db_session):
 async def test_log_fk_requires_existing_sincronizacion(db_session):
     db_session.add(
         LogError(
-            correlation_id=uuid.uuid4(), servicio_responsable="API_Gateway",
-            nivel_error=NivelError.error, codigo_error="ERR_JSON_MALFORMED", mensaje="bad",
+            correlation_id=uuid.uuid4(),
+            servicio_responsable="API_Gateway",
+            nivel_error=NivelError.error,
+            codigo_error="ERR_JSON_MALFORMED",
+            mensaje="bad",
         )
     )
     with pytest.raises(IntegrityError):
@@ -253,8 +284,10 @@ async def test_keyset_cursor_monotonicity(db_session):
     for i in range(5):
         db_session.add(
             LogError(
-                correlation_id=sync.correlation_id, servicio_responsable="Data_Worker",
-                nivel_error=NivelError.error, codigo_error="ERR_JSON_MALFORMED",
+                correlation_id=sync.correlation_id,
+                servicio_responsable="Data_Worker",
+                nivel_error=NivelError.error,
+                codigo_error="ERR_JSON_MALFORMED",
                 mensaje=f"msg-{i}",
             )
         )

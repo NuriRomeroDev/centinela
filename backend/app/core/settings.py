@@ -14,25 +14,21 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    # Application
     app_name: str = "Centinela API"
     environment: str = "development"
     backend_port: int = 8000
     frontend_port: int = 5173
 
-    # Database
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/centinela"
     db_pool_size: int = 20
     db_max_overflow: int = 10
     db_pool_timeout: float = 5.0
     db_pool_pre_ping: bool = True
 
-    # DB retry — bounded exponential backoff + jitter at connection acquisition
     db_retry_initial_backoff: float = 0.5
     db_retry_max_attempts: int = 3
     db_retry_jitter: float = 0.25
 
-    # CORS
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
 

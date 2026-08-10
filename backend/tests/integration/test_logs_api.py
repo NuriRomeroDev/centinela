@@ -11,10 +11,7 @@ Scenarios (logs-api spec R1–R4, tasks.md T2.6):
 
 import math
 
-from sqlalchemy import insert
-
-from app.models import LogError
-from tests.integration.helpers import log_row, sync_row, utcnow
+from tests.integration.helpers import log_row, sync_row
 
 LOGS_URL = "/api/v1/logs"
 
@@ -51,7 +48,13 @@ async def test_logs_first_page_shape_and_total(api_client, db_session):
     assert [item["id"] for item in body["items"]] == list(range(38, 29, -1))  # newest first
     assert math.ceil(38 / 9) == 5  # footer page squares derivable client-side
     assert set(body["items"][0].keys()) == {
-        "id", "correlation_id", "nivel_error", "codigo_error", "mensaje", "servicio_responsable", "creado_at",
+        "id",
+        "correlation_id",
+        "nivel_error",
+        "codigo_error",
+        "mensaje",
+        "servicio_responsable",
+        "creado_at",
     }
 
 
@@ -130,17 +133,21 @@ async def test_logs_search_composes_with_cursor(api_client, db_session):
 
     page1 = (await api_client.get(LOGS_URL, params={"search": "mensaje 2", "page_size": 5})).json()
     assert page1["total"] == 11  # mensaje 2, 20..29
-    page2 = (await api_client.get(
-        LOGS_URL, params={"search": "mensaje 2", "page_size": 5, "cursor": page1["next_cursor"]}
-    )).json()
+    page2 = (
+        await api_client.get(
+            LOGS_URL, params={"search": "mensaje 2", "page_size": 5, "cursor": page1["next_cursor"]}
+        )
+    ).json()
 
     seen = [item["id"] for item in page1["items"]] + [item["id"] for item in page2["items"]]
     assert len(seen) == len(set(seen))  # no overlap
     assert len(page2["items"]) == 5
     assert page2["next_cursor"] is not None
-    page3 = (await api_client.get(
-        LOGS_URL, params={"search": "mensaje 2", "page_size": 5, "cursor": page2["next_cursor"]}
-    )).json()
+    page3 = (
+        await api_client.get(
+            LOGS_URL, params={"search": "mensaje 2", "page_size": 5, "cursor": page2["next_cursor"]}
+        )
+    ).json()
     assert len(page3["items"]) == 1  # 11 = 5 + 5 + 1
     assert page3["next_cursor"] is None
 

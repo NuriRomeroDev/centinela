@@ -29,9 +29,13 @@ ACCIONES = {"RETRY_JOB", "FORCE_SKIP_VALIDATION", "MANUAL_REQUEUE", "PURGE_DUPLI
 async def _table_counts(session) -> dict[str, int]:
     return {
         "sincronizaciones": await session.scalar(select(func.count()).select_from(Sincronizacion)),
-        "archivos_procesados": await session.scalar(select(func.count()).select_from(ArchivoProcesado)),
+        "archivos_procesados": await session.scalar(
+            select(func.count()).select_from(ArchivoProcesado)
+        ),
         "logs_errores": await session.scalar(select(func.count()).select_from(LogError)),
-        "acciones_remediacion": await session.scalar(select(func.count()).select_from(AccionRemediacion)),
+        "acciones_remediacion": await session.scalar(
+            select(func.count()).select_from(AccionRemediacion)
+        ),
     }
 
 
@@ -58,11 +62,17 @@ async def test_seed_parity_mirrors_plantilla(db_session):
     assert codigos == set(ERROR_CODES)  # all 8 error codes
     niveles = set((await db_session.scalars(select(LogError.nivel_error).distinct())).all())
     assert niveles == {NivelError.warning, NivelError.error, NivelError.critical}
-    servicios = set((await db_session.scalars(select(LogError.servicio_responsable).distinct())).all())
+    servicios = set(
+        (await db_session.scalars(select(LogError.servicio_responsable).distinct())).all()
+    )
     assert servicios == SERVICIOS
-    acciones = set((await db_session.scalars(select(AccionRemediacion.accion_ejecutada).distinct())).all())
+    acciones = set(
+        (await db_session.scalars(select(AccionRemediacion.accion_ejecutada).distinct())).all()
+    )
     assert acciones == ACCIONES
-    resultados = set((await db_session.scalars(select(AccionRemediacion.resultado).distinct())).all())
+    resultados = set(
+        (await db_session.scalars(select(AccionRemediacion.resultado).distinct())).all()
+    )
     assert resultados == {Resultado.success, Resultado.failed}
 
 
@@ -77,7 +87,9 @@ async def test_seed_checksums_are_unique_and_64_hex(db_session):
 async def test_seed_has_rejected_files_and_remediations(db_session):
     await seed(db_session)
     rejected = await db_session.scalar(
-        select(func.count()).select_from(ArchivoProcesado).where(ArchivoProcesado.estado == ArchivoEstado.rejected)
+        select(func.count())
+        .select_from(ArchivoProcesado)
+        .where(ArchivoProcesado.estado == ArchivoEstado.rejected)
     )
     assert rejected and rejected > 0  # rejected files KPI has content
     remediaciones = await db_session.scalar(select(func.count()).select_from(AccionRemediacion))

@@ -32,12 +32,17 @@ from app.models import (
 )
 from app.models.enums import ArchivoEstado, NivelError, Resultado, SyncEstado, TipoArchivo
 
-# Fixed namespace so every seeded correlation_id / checksum is deterministic.
 SEED_NAMESPACE = uuid.UUID("6f0f2f0e-3f3a-4a1e-9c2b-5d6e7f8a9b0c")
 
 SYNC_ESTADOS = (
-    "completed", "completed", "running", "failed",
-    "completed", "pending", "rejected", "completed",
+    "completed",
+    "completed",
+    "running",
+    "failed",
+    "completed",
+    "pending",
+    "rejected",
+    "completed",
 )
 TIPOS = (TipoArchivo.ventas, TipoArchivo.inventario, TipoArchivo.clientes)
 
@@ -127,9 +132,15 @@ def _build_archivos(syncs: list[Sincronizacion]) -> list[ArchivoProcesado]:
                     checksum=_checksum(f"sync-{i}-file-{j}"),
                     estado=ArchivoEstado.rejected if rechazado else ArchivoEstado.accepted,
                     registros_totales=registros,
-                    datos_payload=None
-                    if rechazado
-                    else {"tipo": tipo.value, "registros": registros, "procesado_por": sync.usuario_origen},
+                    datos_payload=(
+                        None
+                        if rechazado
+                        else {
+                            "tipo": tipo.value,
+                            "registros": registros,
+                            "procesado_por": sync.usuario_origen,
+                        }
+                    ),
                 )
             )
     return archivos
@@ -171,9 +182,13 @@ def _build_acciones(syncs: list[Sincronizacion]) -> list[AccionRemediacion]:
 async def _counts(session: AsyncSession) -> dict[str, int]:
     return {
         "sincronizaciones": await session.scalar(select(func.count()).select_from(Sincronizacion)),
-        "archivos_procesados": await session.scalar(select(func.count()).select_from(ArchivoProcesado)),
+        "archivos_procesados": await session.scalar(
+            select(func.count()).select_from(ArchivoProcesado)
+        ),
         "logs_errores": await session.scalar(select(func.count()).select_from(LogError)),
-        "acciones_remediacion": await session.scalar(select(func.count()).select_from(AccionRemediacion)),
+        "acciones_remediacion": await session.scalar(
+            select(func.count()).select_from(AccionRemediacion)
+        ),
     }
 
 
@@ -185,10 +200,8 @@ async def seed(session: AsyncSession) -> SeedResult:
 
     syncs = _build_syncs()
     session.add_all(syncs)
-    await session.flush()  # ids + correlation ids materialized for FKs
-    session.add_all(
-        _build_archivos(syncs) + _build_logs(syncs) + _build_acciones(syncs)
-    )
+    await session.flush()
+    session.add_all(_build_archivos(syncs) + _build_logs(syncs) + _build_acciones(syncs))
     await session.commit()
     return SeedResult(skipped=False, counts=await _counts(session))
 

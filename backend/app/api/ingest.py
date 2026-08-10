@@ -66,17 +66,13 @@ async def ingest(
     """Accept a raw stream, compute SHA-256 incrementally, persist idempotently."""
     cid = headers.correlation_id or uuid.uuid4()
 
-    # 1) Stream + incremental hash (8 KB chunks, CPU offloaded to threads).
     digest, payload = await read_body_and_hash(request)
 
-    # 2) Checksum comparison → 422 ERR_CHECKSUM_MISMATCH + structured log row.
     if digest != headers.x_checksum_sha256.lower():
         raise ChecksumMismatchError(correlation_id=str(cid))
 
-    # 3) Parse + validate payload (off the event loop) → 422 on corruption.
     records = await parse_payload_async(payload, correlation_id=str(cid))
 
-    # 4) Idempotent persist: single txn (sync + archivo + JSONB); replay 200.
     engine = request.app.state.engine
     factory = request.app.state.session_factory
     async with retry_acquire(engine) as conn:

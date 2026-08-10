@@ -32,7 +32,9 @@ async def remediations_list(session: AsyncSession = Depends(get_session)) -> lis
 
 class RemediationIn(BaseModel):
     sincronizacion_id: uuid.UUID
-    accion_ejecutada: Literal["RETRY_JOB", "FORCE_SKIP_VALIDATION", "MANUAL_REQUEUE", "PURGE_DUPLICATE"]
+    accion_ejecutada: Literal[
+        "RETRY_JOB", "FORCE_SKIP_VALIDATION", "MANUAL_REQUEUE", "PURGE_DUPLICATE"
+    ]
     ejecutado_por: str
     resultado: Literal["success", "failed"]
     notas: str | None = None

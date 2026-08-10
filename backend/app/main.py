@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         await probe_database(engine)
         logger.info("database connectivity probe OK")
-    except Exception as exc:  # noqa: BLE001 — probe must never crash boot
+    except Exception as exc:  # noqa: BLE001
         logger.warning("database probe failed at startup: %s", exc)
     yield
     await engine.dispose()

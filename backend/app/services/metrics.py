@@ -21,19 +21,28 @@ SYNC_ESTADOS: tuple[SyncEstado, ...] = tuple(SyncEstado)
 async def metrics(session: AsyncSession) -> dict:
     """KPI metrics (dashboard-api spec R1); zeros on empty dataset."""
     activas = await session.scalar(
-        select(func.count()).select_from(Sincronizacion).where(Sincronizacion.estado == SyncEstado.running)
+        select(func.count())
+        .select_from(Sincronizacion)
+        .where(Sincronizacion.estado == SyncEstado.running)
     )
     completadas_hoy = await session.scalar(
         select(func.count())
         .select_from(Sincronizacion)
-        .where(Sincronizacion.estado == SyncEstado.completed, Sincronizacion.fecha_ejecucion == date.today())
+        .where(
+            Sincronizacion.estado == SyncEstado.completed,
+            Sincronizacion.fecha_ejecucion == date.today(),
+        )
     )
     rechazados = await session.scalar(
-        select(func.count()).select_from(ArchivoProcesado).where(ArchivoProcesado.estado == ArchivoEstado.rejected)
+        select(func.count())
+        .select_from(ArchivoProcesado)
+        .where(ArchivoProcesado.estado == ArchivoEstado.rejected)
     )
     total_logs = await session.scalar(select(func.count()).select_from(LogError))
     criticos = await session.scalar(
-        select(func.count()).select_from(LogError).where(LogError.nivel_error == NivelError.critical)
+        select(func.count())
+        .select_from(LogError)
+        .where(LogError.nivel_error == NivelError.critical)
     )
     tasa = (criticos / total_logs * 100) if total_logs else 0.0
     return {
@@ -76,7 +85,11 @@ async def throughput(session: AsyncSession, days: int) -> list[dict]:
 
 async def status_distribution(session: AsyncSession) -> list[dict]:
     """Per-estado {estado, count, pct} over the 5 estados, count desc, pct 1 dp."""
-    rows = (await session.execute(select(Sincronizacion.estado, func.count()).group_by(Sincronizacion.estado))).all()
+    rows = (
+        await session.execute(
+            select(Sincronizacion.estado, func.count()).group_by(Sincronizacion.estado)
+        )
+    ).all()
     counts = {estado: count for estado, count in rows}
     total = sum(counts.values())
     items = [
@@ -95,7 +108,13 @@ async def recent_logs(session: AsyncSession, limit: int) -> list[dict]:
     """Newest logs (creado_at DESC, id DESC), NO stack_trace, limit clamped 1–20."""
     limit = min(max(limit, 1), 20)
     rows = (
-        (await session.execute(select(LogError).order_by(LogError.creado_at.desc(), LogError.id.desc()).limit(limit)))
+        (
+            await session.execute(
+                select(LogError)
+                .order_by(LogError.creado_at.desc(), LogError.id.desc())
+                .limit(limit)
+            )
+        )
         .scalars()
         .all()
     )

@@ -38,7 +38,11 @@ def _response_dict(sync: Sincronizacion, archivo: ArchivoProcesado) -> dict:
         "sync_id": str(sync.id),
         "estado": sync.estado.value if hasattr(sync.estado, "value") else str(sync.estado),
         "nombre_archivo": archivo.nombre_archivo,
-        "tipo_archivo": archivo.tipo_archivo.value if hasattr(archivo.tipo_archivo, "value") else str(archivo.tipo_archivo),
+        "tipo_archivo": (
+            archivo.tipo_archivo.value
+            if hasattr(archivo.tipo_archivo, "value")
+            else str(archivo.tipo_archivo)
+        ),
         "checksum": archivo.checksum,
         "registros_totales": archivo.registros_totales,
     }
@@ -104,12 +108,9 @@ async def ingest_batch(
         .options(selectinload(Sincronizacion.archivos))
     )
     if existing and existing.archivos:
-        # pre-check hit → idempotent replay of the ORIGINAL result
         await _persist_duplicate_log(factory, existing.correlation_id)
         return 200, _response_dict(existing, existing.archivos[0])
 
-    # Reuse a previous FAILED attempt's sync (corrupt payload, same cid) —
-    # unique(correlation_id) forbids a second row; its logs stay intact.
     sync = existing or Sincronizacion(correlation_id=correlation_id)
     sync.fecha_ejecucion = date.today()
     sync.estado = SyncEstado.completed
@@ -135,12 +136,8 @@ async def ingest_batch(
     try:
         await session.commit()
     except IntegrityError:
-        # TOCTOU: another request committed first (same correlation_id or same
-        # unique checksum) → treat as duplicate, return the original.
         await session.rollback()
-        original = await _load_original(
-            factory, correlation_id=correlation_id, checksum=checksum
-        )
+        original = await _load_original(factory, correlation_id=correlation_id, checksum=checksum)
         if original is None or not original.archivos:
             raise
         await _persist_duplicate_log(factory, original.correlation_id)

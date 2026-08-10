@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Enum, ForeignKey, Index, Integer, String, text
 from sqlalchemy.dialects.postgresql import JSONB
@@ -10,6 +11,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.enums import ArchivoEstado, TipoArchivo, enum_values
+
+if TYPE_CHECKING:
+    from app.models.sincronizacion import Sincronizacion
 
 
 class ArchivoProcesado(Base):

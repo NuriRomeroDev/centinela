@@ -3,7 +3,7 @@
 RED phase: references ``app.models.*`` which do not exist yet.
 """
 
-from sqlalchemy import Date, DateTime, Enum as SAEnum, Index, Integer, Uuid
+from sqlalchemy import Date, DateTime, Enum as SAEnum, Integer, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 
 from app.db.base import Base
@@ -72,9 +72,7 @@ def test_sincronizaciones_estado_enum():
 def test_sincronizaciones_composite_index_and_unique_correlation():
     t = Sincronizacion.__table__
     assert any(idx.unique for idx in t.indexes)  # unique index on correlation_id
-    assert any(
-        idx.columns.keys() == ["estado", "fecha_ejecucion"] for idx in t.indexes
-    )
+    assert any(idx.columns.keys() == ["estado", "fecha_ejecucion"] for idx in t.indexes)
     assert any(idx.columns.keys() == ["estado"] for idx in t.indexes)
     assert any(idx.columns.keys() == ["fecha_ejecucion"] for idx in t.indexes)
 
@@ -112,9 +110,7 @@ def test_archivos_fk_cascade_to_sincronizaciones():
 
 def test_archivos_composite_index():
     t = ArchivoProcesado.__table__
-    assert any(
-        idx.columns.keys() == ["sincronizacion_id", "estado"] for idx in t.indexes
-    )
+    assert any(idx.columns.keys() == ["sincronizacion_id", "estado"] for idx in t.indexes)
 
 
 # --- logs_errores (data-model Req 3) ----------------------------------------
@@ -140,11 +136,7 @@ def test_logs_fk_targets_sincronizaciones_correlation_id_cascade():
 
 def test_logs_desc_composite_index():
     t = LogError.__table__
-    desc = [
-        idx
-        for idx in t.indexes
-        if any("DESC" in str(expr) for expr in idx.expressions)
-    ]
+    desc = [idx for idx in t.indexes if any("DESC" in str(expr) for expr in idx.expressions)]
     assert desc, "missing (correlation_id, creado_at DESC) index"
     assert any("correlation_id" in str(e) for e in desc[0].expressions)
 

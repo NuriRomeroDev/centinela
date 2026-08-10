@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.enums import Resultado, enum_values
+
+if TYPE_CHECKING:
+    from app.models.sincronizacion import Sincronizacion
 
 
 class AccionRemediacion(Base):
@@ -19,7 +23,11 @@ class AccionRemediacion(Base):
     __table_args__ = (
         Index("ix_acciones_remediacion_sincronizacion_id", "sincronizacion_id"),
         Index("ix_acciones_remediacion_ejecutada_at", "ejecutada_at"),
-        Index("ix_acciones_remediacion_sincronizacion_id_ejecutada_at", "sincronizacion_id", "ejecutada_at"),
+        Index(
+            "ix_acciones_remediacion_sincronizacion_id_ejecutada_at",
+            "sincronizacion_id",
+            "ejecutada_at",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

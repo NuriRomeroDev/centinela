@@ -10,7 +10,9 @@ def log_item(log: LogError) -> dict:
     return {
         "id": log.id,
         "correlation_id": str(log.correlation_id),
-        "nivel_error": log.nivel_error.value if hasattr(log.nivel_error, "value") else str(log.nivel_error),
+        "nivel_error": (
+            log.nivel_error.value if hasattr(log.nivel_error, "value") else str(log.nivel_error)
+        ),
         "codigo_error": log.codigo_error,
         "mensaje": log.mensaje,
         "servicio_responsable": log.servicio_responsable,

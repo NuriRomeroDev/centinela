@@ -68,7 +68,6 @@ async def list_logs(
             .all()
         )
         items = rows[:page_size]
-        # lookahead row proves more exist; cursor = last RETURNED id so no row is dropped
         next_cursor = items[-1].id if len(rows) > page_size else None
     else:
         page = max(page, 1)

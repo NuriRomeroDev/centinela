@@ -4,12 +4,18 @@ from __future__ import annotations
 
 import uuid
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, DateTime, Enum, Index, String, Uuid, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from app.models.enums import SyncEstado, enum_values
+
+if TYPE_CHECKING:
+    from app.models.accion_remediacion import AccionRemediacion
+    from app.models.archivo import ArchivoProcesado
+    from app.models.log_error import LogError
 
 
 class Sincronizacion(Base):

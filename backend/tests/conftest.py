@@ -70,9 +70,7 @@ async def db_session(db_engine: AsyncEngine):
     """Per-test session over a clean (truncated) database."""
     factory = async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
     async with factory() as session:
-        await session.execute(
-            text(f"TRUNCATE {', '.join(ALL_TABLES)} RESTART IDENTITY CASCADE")
-        )
+        await session.execute(text(f"TRUNCATE {', '.join(ALL_TABLES)} RESTART IDENTITY CASCADE"))
         await session.commit()
         yield session
 
@@ -85,9 +83,7 @@ async def clean_db(db_engine: AsyncEngine):
     """Truncate every table so each API test starts from an empty database."""
     factory = async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
     async with factory() as session:
-        await session.execute(
-            text(f"TRUNCATE {', '.join(ALL_TABLES)} RESTART IDENTITY CASCADE")
-        )
+        await session.execute(text(f"TRUNCATE {', '.join(ALL_TABLES)} RESTART IDENTITY CASCADE"))
         await session.commit()
 
 

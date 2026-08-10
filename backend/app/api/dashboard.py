@@ -18,7 +18,9 @@ async def dashboard_metrics(session: AsyncSession = Depends(get_session)) -> dic
 
 
 @router.get("/throughput")
-async def throughput_endpoint(days: int = 7, session: AsyncSession = Depends(get_session)) -> list[dict]:
+async def throughput_endpoint(
+    days: int = 7, session: AsyncSession = Depends(get_session)
+) -> list[dict]:
     """Per-day accepted/rejected files, zero-filled, days clamped 1–30."""
     return await throughput(session, days)
 

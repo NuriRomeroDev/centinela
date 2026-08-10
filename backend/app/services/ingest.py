@@ -1,9 +1,10 @@
-"""Ingest processing: streamed body reading, incremental hashing, payload parsing (design §4.4/§4.5).
+"""Ingest processing: streamed body reading, incremental hashing, payload parsing.
 
-CPU-heavy work (per-chunk ``sha256.update``, ``hexdigest``, ``json.loads``,
-record validation) is offloaded to executor threads via ``asyncio.to_thread`` so
-the event loop never blocks while hashing or parsing multi-MB bodies. Memory
-stays O(chunk) for hashing; the parsed payload is retained for JSONB storage.
+Design §4.4/§4.5: CPU-heavy work (per-chunk ``sha256.update``, ``hexdigest``,
+``json.loads``, record validation) is offloaded to executor threads via
+``asyncio.to_thread`` so the event loop never blocks while hashing or parsing
+multi-MB bodies. Memory stays O(chunk) for hashing; the parsed payload is
+retained for JSONB storage.
 """
 
 from __future__ import annotations
@@ -14,7 +15,6 @@ import json
 from app.core.errors import JsonMalformedError, NetworkResetError, ValidationRejectedError
 from app.core.hashing import IncrementalSha256
 
-# Exceptions raised by the ASGI server when the peer resets/closes mid-stream.
 RETRYABLE_STREAM_EXCEPTIONS: tuple[type[BaseException], ...] = (
     ConnectionResetError,
     ConnectionAbortedError,

@@ -70,10 +70,14 @@ async def test_ingest_happy_path_returns_201_with_response_shape(api_client, db_
 async def test_ingest_replay_returns_200_original_payload_and_duplicate_log(api_client, db_session):
     cid = str(uuid.uuid4())
     first = await api_client.post(
-        "/api/v1/ingest", content=PAYLOAD, headers=_headers(correlation_id=cid, checksum=_checksum(PAYLOAD))
+        "/api/v1/ingest",
+        content=PAYLOAD,
+        headers=_headers(correlation_id=cid, checksum=_checksum(PAYLOAD)),
     )
     replay = await api_client.post(
-        "/api/v1/ingest", content=PAYLOAD, headers=_headers(correlation_id=cid, checksum=_checksum(PAYLOAD))
+        "/api/v1/ingest",
+        content=PAYLOAD,
+        headers=_headers(correlation_id=cid, checksum=_checksum(PAYLOAD)),
     )
 
     assert first.status_code == 201
@@ -93,7 +97,9 @@ async def test_ingest_replay_returns_200_original_payload_and_duplicate_log(api_
 
 async def test_ingest_without_correlation_id_uses_server_fallback(api_client, db_session):
     response = await api_client.post(
-        "/api/v1/ingest", content=PAYLOAD, headers=_headers(correlation_id=None, checksum=_checksum(PAYLOAD))
+        "/api/v1/ingest",
+        content=PAYLOAD,
+        headers=_headers(correlation_id=None, checksum=_checksum(PAYLOAD)),
     )
 
     assert response.status_code == 201
@@ -108,7 +114,9 @@ async def test_ingest_checksum_mismatch_returns_422_with_log_row(api_client, db_
     cid = str(uuid.uuid4())
     wrong_checksum = "0" * 64
     response = await api_client.post(
-        "/api/v1/ingest", content=PAYLOAD, headers=_headers(correlation_id=cid, checksum=wrong_checksum)
+        "/api/v1/ingest",
+        content=PAYLOAD,
+        headers=_headers(correlation_id=cid, checksum=wrong_checksum),
     )
 
     assert response.status_code == 422
@@ -128,7 +136,9 @@ async def test_ingest_malformed_json_returns_422_err_json_malformed(api_client, 
     cid = str(uuid.uuid4())
     body = b'{"broken": json, not valid'
     response = await api_client.post(
-        "/api/v1/ingest", content=body, headers=_headers(correlation_id=cid, checksum=_checksum(body))
+        "/api/v1/ingest",
+        content=body,
+        headers=_headers(correlation_id=cid, checksum=_checksum(body)),
     )
 
     assert response.status_code == 422
@@ -145,7 +155,9 @@ async def test_ingest_schema_validation_failure_returns_422(api_client, db_sessi
     cid = str(uuid.uuid4())
     body = b'{"tipo": "ventas", "registros": 10}'  # valid JSON but NOT a list of records
     response = await api_client.post(
-        "/api/v1/ingest", content=body, headers=_headers(correlation_id=cid, checksum=_checksum(body))
+        "/api/v1/ingest",
+        content=body,
+        headers=_headers(correlation_id=cid, checksum=_checksum(body)),
     )
 
     assert response.status_code == 422

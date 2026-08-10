@@ -77,9 +77,8 @@ async def acquire_with_retry(
         conn: AsyncConnection | None = None
         try:
             conn = await engine.connect()
-            await conn.execute(text("SELECT 1"))  # forces pool checkout + pre_ping
-            await conn.commit()  # close the probe's implicit txn — a bound AsyncSession
-            # must own its own transaction or session.commit() would not persist
+            await conn.execute(text("SELECT 1"))
+            await conn.commit()
             return conn
         except policy.retryable_exceptions as exc:
             last_exc = exc

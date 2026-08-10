@@ -20,7 +20,9 @@ depends_on = None
 SYNC_ESTADO = postgresql.ENUM(
     "pending", "running", "completed", "failed", "rejected", name="sync_estado", create_type=False
 )
-TIPO_ARCHIVO = postgresql.ENUM("ventas", "inventario", "clientes", name="tipo_archivo", create_type=False)
+TIPO_ARCHIVO = postgresql.ENUM(
+    "ventas", "inventario", "clientes", name="tipo_archivo", create_type=False
+)
 ARCHIVO_ESTADO = postgresql.ENUM("accepted", "rejected", name="archivo_estado", create_type=False)
 NIVEL_ERROR = postgresql.ENUM("WARNING", "ERROR", "CRITICAL", name="nivel_error", create_type=False)
 RESULTADO = postgresql.ENUM("success", "failed", name="resultado", create_type=False)
@@ -28,7 +30,9 @@ RESULTADO = postgresql.ENUM("success", "failed", name="resultado", create_type=F
 
 def upgrade() -> None:
     # --- enums -----------------------------------------------------------------
-    op.execute("CREATE TYPE sync_estado AS ENUM ('pending', 'running', 'completed', 'failed', 'rejected')")
+    op.execute(
+        "CREATE TYPE sync_estado AS ENUM ('pending', 'running', 'completed', 'failed', 'rejected')"
+    )
     op.execute("CREATE TYPE tipo_archivo AS ENUM ('ventas', 'inventario', 'clientes')")
     op.execute("CREATE TYPE archivo_estado AS ENUM ('accepted', 'rejected')")
     op.execute("CREATE TYPE nivel_error AS ENUM ('WARNING', 'ERROR', 'CRITICAL')")
@@ -37,7 +41,12 @@ def upgrade() -> None:
     # --- sincronizaciones ------------------------------------------------------
     op.create_table(
         "sincronizaciones",
-        sa.Column("id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
+        sa.Column(
+            "id",
+            postgresql.UUID(as_uuid=True),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
+        ),
         sa.Column("correlation_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("fecha_ejecucion", sa.Date(), nullable=False),
         sa.Column("estado", SYNC_ESTADO, server_default=sa.text("'pending'"), nullable=False),
@@ -46,10 +55,16 @@ def upgrade() -> None:
         sa.Column("usuario_origen", sa.String(length=100), nullable=False),
         sa.PrimaryKeyConstraint("id", name="pk_sincronizaciones"),
     )
-    op.create_index("ix_sincronizaciones_correlation_id", "sincronizaciones", ["correlation_id"], unique=True)
+    op.create_index(
+        "ix_sincronizaciones_correlation_id", "sincronizaciones", ["correlation_id"], unique=True
+    )
     op.create_index("ix_sincronizaciones_estado", "sincronizaciones", ["estado"])
     op.create_index("ix_sincronizaciones_fecha_ejecucion", "sincronizaciones", ["fecha_ejecucion"])
-    op.create_index("ix_sincronizaciones_estado_fecha_ejecucion", "sincronizaciones", ["estado", "fecha_ejecucion"])
+    op.create_index(
+        "ix_sincronizaciones_estado_fecha_ejecucion",
+        "sincronizaciones",
+        ["estado", "fecha_ejecucion"],
+    )
 
     # --- archivos_procesados ---------------------------------------------------
     op.create_table(
@@ -70,10 +85,18 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name="pk_archivos_procesados"),
     )
-    op.create_index("ix_archivos_procesados_checksum", "archivos_procesados", ["checksum"], unique=True)
-    op.create_index("ix_archivos_procesados_sincronizacion_id", "archivos_procesados", ["sincronizacion_id"])
+    op.create_index(
+        "ix_archivos_procesados_checksum", "archivos_procesados", ["checksum"], unique=True
+    )
+    op.create_index(
+        "ix_archivos_procesados_sincronizacion_id", "archivos_procesados", ["sincronizacion_id"]
+    )
     op.create_index("ix_archivos_procesados_estado", "archivos_procesados", ["estado"])
-    op.create_index("ix_archivos_procesados_sincronizacion_id_estado", "archivos_procesados", ["sincronizacion_id", "estado"])
+    op.create_index(
+        "ix_archivos_procesados_sincronizacion_id_estado",
+        "archivos_procesados",
+        ["sincronizacion_id", "estado"],
+    )
 
     # --- logs_errores ----------------------------------------------------------
     op.create_table(
@@ -85,7 +108,9 @@ def upgrade() -> None:
         sa.Column("codigo_error", sa.String(length=50), nullable=False),
         sa.Column("mensaje", sa.Text(), nullable=False),
         sa.Column("stack_trace", sa.Text(), nullable=True),
-        sa.Column("creado_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column(
+            "creado_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False
+        ),
         sa.ForeignKeyConstraint(
             ["correlation_id"],
             ["sincronizaciones.correlation_id"],
@@ -110,7 +135,12 @@ def upgrade() -> None:
         sa.Column("ejecutado_por", sa.String(length=100), nullable=False),
         sa.Column("resultado", RESULTADO, nullable=False),
         sa.Column("notas", sa.Text(), nullable=True),
-        sa.Column("ejecutada_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column(
+            "ejecutada_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.ForeignKeyConstraint(
             ["sincronizacion_id"],
             ["sincronizaciones.id"],
@@ -119,8 +149,12 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name="pk_acciones_remediacion"),
     )
-    op.create_index("ix_acciones_remediacion_sincronizacion_id", "acciones_remediacion", ["sincronizacion_id"])
-    op.create_index("ix_acciones_remediacion_ejecutada_at", "acciones_remediacion", ["ejecutada_at"])
+    op.create_index(
+        "ix_acciones_remediacion_sincronizacion_id", "acciones_remediacion", ["sincronizacion_id"]
+    )
+    op.create_index(
+        "ix_acciones_remediacion_ejecutada_at", "acciones_remediacion", ["ejecutada_at"]
+    )
     op.create_index(
         "ix_acciones_remediacion_sincronizacion_id_ejecutada_at",
         "acciones_remediacion",

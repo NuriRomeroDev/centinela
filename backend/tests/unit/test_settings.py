@@ -8,7 +8,9 @@ from app.core.settings import Settings, get_settings
 
 def test_settings_defaults_match_design():
     settings = Settings(_env_file=None)
-    assert settings.database_url == "postgresql+asyncpg://postgres:postgres@localhost:5432/centinela"
+    assert (
+        settings.database_url == "postgresql+asyncpg://postgres:postgres@localhost:5432/centinela"
+    )
     assert settings.db_pool_size == 20
     assert settings.db_max_overflow == 10
     assert settings.db_pool_timeout == 5.0
