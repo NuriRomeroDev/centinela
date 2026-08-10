@@ -64,7 +64,6 @@ body {
   }
 }
 
-/* Shell layout */
 .shell {
   display: flex;
   height: 100%;
@@ -87,7 +86,6 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
-/* Sidebar */
 .sidebar {
   width: 248px;
   flex-shrink: 0;
@@ -204,7 +202,6 @@ body {
   background: var(--env-dot);
 }
 
-/* Header */
 .header {
   height: 64px;
   flex-shrink: 0;
@@ -248,7 +245,6 @@ body {
   font-weight: 700;
 }
 
-/* Theme toggle */
 .theme-toggle {
   display: flex;
   background: var(--toggle-track);
@@ -275,7 +271,6 @@ body {
   color: var(--on-accent);
 }
 
-/* Dashboard */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -542,7 +537,6 @@ body {
   background: var(--track-bg);
 }
 
-/* Logs screen */
 .logs-toolbar {
   display: flex;
   gap: 12px;
@@ -725,7 +719,6 @@ body {
   color: var(--text-secondary);
 }
 
-/* Level + status badges (D-4: A/B variants via tokens) */
 .level-badge {
   font-size: 10.5px;
   font-weight: 700;
@@ -788,7 +781,6 @@ body {
   color: var(--status-completed-text);
 }
 
-/* Stack trace modal */
 .stack-modal-mask {
   position: fixed;
   inset: 0;
@@ -939,7 +931,6 @@ body {
   filter: brightness(1.06);
 }
 
-/* Sincronizaciones */
 .syncs-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -1032,7 +1023,6 @@ body {
   text-align: right;
 }
 
-/* Remediación */
 .remediation-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);

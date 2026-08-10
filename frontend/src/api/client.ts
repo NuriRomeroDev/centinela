@@ -29,13 +29,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new ApiError(0, 'No se pudo conectar con el servidor')
   }
   if (!response.ok) {
-    let detail = response.statusText
-    try {
-      const body = (await response.json()) as { detail?: string }
-      detail = body.detail ?? detail
-    } catch {
-      // keep statusText when the body is not JSON
-    }
+    const body = (await response.json().catch(() => null)) as { detail?: string } | null
+    const detail = body?.detail ?? response.statusText
     throw new ApiError(response.status, detail)
   }
   return (await response.json()) as T
