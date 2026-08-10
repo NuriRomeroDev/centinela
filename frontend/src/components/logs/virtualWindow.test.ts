@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getWindow, ROW_H, VIEWPORT_H, OVERSCAN, visibleCount } from './virtualWindow'
+import { getWindow, ROW_H, VIEWPORT_H, OVERSCAN, spacerHeight, visibleCount } from './virtualWindow'
 
 describe('virtualWindow math', () => {
   it('exports the mock geometry constants', () => {
@@ -28,5 +28,12 @@ describe('virtualWindow math', () => {
 
   it('handles empty lists', () => {
     expect(getWindow(0, 0)).toEqual({ start: 0, end: -1 })
+  })
+})
+
+describe('spacerHeight', () => {
+  it('returns total * ROW_H', () => {
+    expect(spacerHeight(38)).toBe(38 * 56)
+    expect(spacerHeight(0)).toBe(0)
   })
 })

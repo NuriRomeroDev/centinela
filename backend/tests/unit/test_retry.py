@@ -18,7 +18,7 @@ from app.db.retry import (
     probe_database,
     retry_acquire,
 )
-from tests.fakes import FakeEngine
+from tests.fakes import FakeEngine, FakeEngineConnectOkExecuteFail
 
 
 class SleepRecorder:
@@ -174,3 +174,15 @@ async def test_probe_database_surfaces_exhaustion_when_db_down():
     with pytest.raises(PoolExhaustedError):
         await probe_database(engine, policy)
     assert engine.attempts == 2
+
+
+async def test_acquire_closes_connection_when_liveness_probe_fails():
+    """Covers retry.py line 86: conn acquired but SELECT 1 raises → conn.close() called."""
+    engine = FakeEngineConnectOkExecuteFail()
+    recorder = SleepRecorder()
+    policy = RetryPolicy(initial_backoff=0.01, max_attempts=1, jitter=0.0)
+    with pytest.raises(PoolExhaustedError):
+        await acquire_with_retry(engine, policy, sleep=recorder)
+    assert engine.attempts == 1
+    assert len(engine.closed_connections) == 1
+    assert engine.closed_connections[0].closed is True

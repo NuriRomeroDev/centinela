@@ -140,6 +140,25 @@ describe('Logs screen', () => {
     expect(screen.getAllByText('ERR_0').length).toBeGreaterThanOrEqual(2)
   })
 
+  it('closes the modal via the close button (covers close() in useOpenLogIdFromRoute)', async () => {
+    const user = userEvent.setup()
+    renderLogs({ openLogId: 1 })
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    await user.click(document.querySelector('.stack-modal-close') as HTMLElement)
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('shows error state with refetch button when logs query fails', async () => {
+    const user = userEvent.setup()
+    mockedApi.logs.mockRejectedValueOnce(new Error('boom'))
+    mockedApi.logs.mockResolvedValue(pageOne)
+    renderLogs()
+    const retryBtn = await screen.findByRole('button', { name: /Reintentar/ })
+    expect(screen.getByText(/No se pudieron cargar los logs/)).toBeInTheDocument()
+    await user.click(retryBtn)
+    expect(await screen.findByText('ERR_0')).toBeInTheDocument()
+  })
+
   it('navigates pages via the footer squares', async () => {
     mockedApi.logs.mockResolvedValueOnce(pageOne)
     mockedApi.logs.mockResolvedValueOnce({

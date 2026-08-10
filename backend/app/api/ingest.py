@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import ChecksumMismatchError
+from app.core.hashing import sha256_hex_process
 from app.db.retry import retry_acquire
 from app.models.enums import TipoArchivo
 from app.schemas.ingest import IngestHeaders
@@ -69,6 +70,12 @@ async def ingest(
     digest, payload = await read_body_and_hash(request)
 
     if digest != headers.x_checksum_sha256.lower():
+        raise ChecksumMismatchError(correlation_id=str(cid))
+
+    # Cross-verify the buffered payload using ProcessPoolExecutor (bypasses GIL
+    # for CPU-bound work on already-buffered bytes — multiprocessing requirement).
+    process_digest = await sha256_hex_process(payload)
+    if process_digest != digest:
         raise ChecksumMismatchError(correlation_id=str(cid))
 
     records = await parse_payload_async(payload, correlation_id=str(cid))

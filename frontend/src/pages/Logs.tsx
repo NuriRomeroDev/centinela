@@ -50,6 +50,16 @@ export default function Logs() {
             placeholder="Buscar por mensaje, código o servicio…"
             aria-label="Buscar logs"
           />
+          {searchRaw && (
+            <button
+              type="button"
+              className="logs-search-clear"
+              aria-label="Limpiar búsqueda"
+              onClick={() => setSearchRaw('')}
+            >
+              ×
+            </button>
+          )}
         </div>
         <div className="logs-count">
           {isDebouncing && <span className="logs-busy">buscando…</span>}
@@ -68,7 +78,17 @@ export default function Logs() {
           <span>Fecha</span>
         </div>
         {logsQuery.isPending ? (
-          <div className="logs-state" aria-busy="true" />
+          <div aria-busy="true" aria-label="Cargando logs">
+            {Array.from({ length: 8 }, (_, i) => (
+              <div className="skeleton-row" key={i}>
+                <div className="skeleton skeleton-cell skeleton-cell--short" />
+                <div className="skeleton skeleton-cell" />
+                <div className="skeleton skeleton-cell" />
+                <div className="skeleton skeleton-cell skeleton-cell--short" />
+                <div className="skeleton skeleton-cell skeleton-cell--short" />
+              </div>
+            ))}
+          </div>
         ) : logsQuery.isError ? (
           <div className="logs-state">
             <p>No se pudieron cargar los logs</p>

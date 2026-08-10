@@ -8,6 +8,16 @@ interface SyncTableProps {
   onRemediate: (id: string, accion: 'RETRY_JOB' | 'FORCE_SKIP_VALIDATION') => void
 }
 
+function fmtTime(iso: string | null): string {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' UTC'
+}
+
+function truncateHash(hash: string): string {
+  return hash.length > 12 ? `${hash.slice(0, 6)}…${hash.slice(-4)}` : hash
+}
+
 function estadoBadge(row: Sync) {
   return <span className={`status-badge status-badge--${row.estado}`}>{row.estado}</span>
 }
@@ -20,13 +30,20 @@ function filesGrid(row: Sync) {
   return (
     <div className="archivos-grid">
       <div className="archivos-label">Archivos procesados</div>
+      <div className="archivo-row archivo-row--header">
+        <span>Archivo</span>
+        <span>Tipo</span>
+        <span>Checksum</span>
+        <span>Estado</span>
+        <span className="archivo-registros">Registros</span>
+      </div>
       {row.archivos?.map((file) => (
         <div className="archivo-row" key={file.checksum}>
           <div className="archivo-nombre">{file.nombre_archivo}</div>
           <span className="tipo-badge">{file.tipo_archivo}</span>
-          <div className="archivo-checksum mono">{file.checksum}</div>
+          <div className="archivo-checksum mono" title={file.checksum}>{truncateHash(file.checksum)}</div>
           {archivoEstadoBadge(file)}
-          <div className="archivo-registros mono">{file.registros_totales}</div>
+          <div className="archivo-registros mono">{file.registros_totales.toLocaleString('es-AR')}</div>
         </div>
       ))}
     </div>
@@ -69,13 +86,13 @@ export default function SyncTable({ syncs, onRemediate }: SyncTableProps) {
         <Column
           field="iniciado_at"
           header="Iniciado"
-          body={(row: Sync) => <span className="sync-time mono">{row.iniciado_at}</span>}
+          body={(row: Sync) => <span className="sync-time mono">{fmtTime(row.iniciado_at)}</span>}
         />
         <Column
           field="finalizado_at"
           header="Finalizado"
           body={(row: Sync) => (
-            <span className="sync-time mono">{row.finalizado_at ?? '—'}</span>
+            <span className="sync-time mono">{fmtTime(row.finalizado_at)}</span>
           )}
         />
         <Column field="usuario_origen" header="Usuario" />

@@ -110,6 +110,12 @@ async def api_app(db_engine: AsyncEngine, clean_db):
 
 
 @pytest_asyncio.fixture
+async def db_factory(db_engine: AsyncEngine):
+    """async_sessionmaker for tests that call services needing a factory arg."""
+    return async_sessionmaker(db_engine, class_=AsyncSession, expire_on_commit=False)
+
+
+@pytest_asyncio.fixture
 async def query_counter(db_engine: AsyncEngine):
     """SQLAlchemy statement counter (before_cursor_execute) for N+1 assertions."""
     counter = {"statements": 0}

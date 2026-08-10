@@ -64,8 +64,8 @@ export default function Dashboard() {
             <KpiCard
               label="Tasa de errores críticos"
               value={`${metricsQuery.data.tasa_errores_criticos}%`}
-              delta="en monitoreo"
-              tone="down"
+              delta={Number(metricsQuery.data.tasa_errores_criticos) > 10 ? 'crítico' : 'en monitoreo'}
+              tone={Number(metricsQuery.data.tasa_errores_criticos) > 10 ? 'down' : 'accent'}
               sub="Sobre el total de logs capturados"
             />
           </>

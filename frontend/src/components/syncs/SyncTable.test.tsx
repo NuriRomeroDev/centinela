@@ -85,7 +85,7 @@ describe('SyncTable', () => {
     const accepted = screen.getAllByText('accepted')
     expect(accepted.length).toBeGreaterThanOrEqual(2)
     expect(accepted[0]).toHaveClass('status-badge--accepted')
-    expect(screen.getByText('1240')).toBeInTheDocument()
+    expect(screen.getByText(/1[.,]?240/)).toBeInTheDocument()
     expect(globalCss).toMatch(/\.sync-chevron\s*\{[^}]*transition:\s*transform\s+0\.15s/)
   })
 

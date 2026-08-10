@@ -10,7 +10,7 @@ interface KpiCardProps {
 
 export default function KpiCard({ label, value, delta, tone, sub }: KpiCardProps) {
   return (
-    <article className="kpi-card">
+    <article className={`kpi-card kpi-card--${tone}`}>
       <div className="kpi-label">{label}</div>
       <div className="kpi-value">{value}</div>
       <div className={`kpi-delta kpi-delta--${tone}`}>{delta}</div>

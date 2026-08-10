@@ -12,7 +12,7 @@ export default function StatusDistribution({
           <div className="status-label">{item.estado}</div>
           <div className="status-bar">
             <div
-              className="status-bar-fill"
+              className={`status-bar-fill status-bar-fill--${item.estado}`}
               role="progressbar"
               aria-valuenow={Number(item.pct)}
               aria-valuemin={0}

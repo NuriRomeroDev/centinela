@@ -96,18 +96,24 @@ def _checksum(key: str) -> str:
     return hashlib.sha256(key.encode()).hexdigest()
 
 
+# Anchor: 2026-08-10 (Monday) — the week being demoed
+_ANCHOR = date(2026, 8, 10)
+
+
 def _ts(day_offset: int, hour: int, minute: int) -> datetime:
-    return datetime(2024, 6, 12 - day_offset, hour, minute, tzinfo=timezone.utc)
+    d = _ANCHOR - __import__("datetime").timedelta(days=day_offset)
+    return datetime(d.year, d.month, d.day, hour, minute, tzinfo=timezone.utc)
 
 
 def _build_syncs() -> list[Sincronizacion]:
     syncs: list[Sincronizacion] = []
     for i, estado in enumerate(SYNC_ESTADOS):
         finalizado = None if estado in ("running", "pending") else _ts(i, 7, (i * 4 + 22) % 60)
+        d = _ANCHOR - __import__("datetime").timedelta(days=i)
         syncs.append(
             Sincronizacion(
                 correlation_id=_cid(f"sync-{i}"),
-                fecha_ejecucion=date(2024, 6, 12 - i),
+                fecha_ejecucion=d,
                 estado=SyncEstado(estado),
                 iniciado_at=_ts(i, 6, i * 4),
                 finalizado_at=finalizado,
@@ -124,10 +130,11 @@ def _build_archivos(syncs: list[Sincronizacion]) -> list[ArchivoProcesado]:
             tipo = TIPOS[j % 3]
             rechazado = (i + j) % 5 == 0
             registros = 1200 + i * 340 + j * 88
+            d = _ANCHOR - __import__("datetime").timedelta(days=i)
             archivos.append(
                 ArchivoProcesado(
                     sincronizacion_id=sync.id,
-                    nombre_archivo=f"lote_{tipo.value}_{12 - i:02d}06_{j + 1:02d}.csv",
+                    nombre_archivo=f"lote_{tipo.value}_{d.strftime('%Y%m%d')}_{j + 1:02d}.csv",
                     tipo_archivo=tipo,
                     checksum=_checksum(f"sync-{i}-file-{j}"),
                     estado=ArchivoEstado.rejected if rechazado else ArchivoEstado.accepted,

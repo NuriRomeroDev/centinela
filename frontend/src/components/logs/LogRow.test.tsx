@@ -61,4 +61,24 @@ describe('LogRow', () => {
     await user.click(screen.getByText('ERR_DB_TIMEOUT'))
     expect(onSelect).toHaveBeenCalledWith(7)
   })
+
+  it('calls onSelect on Enter key', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<LogRow log={log} index={0} onSelect={onSelect} />)
+    const row = screen.getByRole('button')
+    row.focus()
+    await user.keyboard('{Enter}')
+    expect(onSelect).toHaveBeenCalledWith(7)
+  })
+
+  it('calls onSelect on Space key', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    render(<LogRow log={log} index={0} onSelect={onSelect} />)
+    const row = screen.getByRole('button')
+    row.focus()
+    await user.keyboard(' ')
+    expect(onSelect).toHaveBeenCalledWith(7)
+  })
 })

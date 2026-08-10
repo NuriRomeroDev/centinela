@@ -1,15 +1,21 @@
 """Incremental SHA-256 hashing — streaming, non-blocking (design §4.5).
 
-CPU-bound work (``update``/``hexdigest``) is offloaded to executor threads so
-the event loop stays free while hashing multi-MB bodies in 8 KB chunks.
+CPU-bound work is offloaded in two ways:
+- Streaming chunks: asyncio.to_thread (ThreadPoolExecutor) — keeps the event
+  loop free while accumulating 8 KB increments across multiple await points.
+- One-shot large payloads: loop.run_in_executor(ProcessPoolExecutor) — bypasses
+  the GIL entirely for pure CPU work on already-buffered bytes.
 """
 
 import asyncio
 import hashlib
+from concurrent.futures import ProcessPoolExecutor
 
 from app.core.errors import ChecksumMismatchError
 
 DEFAULT_CHUNK_SIZE = 8192
+
+_process_pool = ProcessPoolExecutor(max_workers=2)
 
 
 class IncrementalSha256:
@@ -29,8 +35,14 @@ class IncrementalSha256:
 
 
 def sha256_hex(data: bytes) -> str:
-    """One-shot SHA-256 hex digest (sync helper)."""
+    """One-shot SHA-256 hex digest (sync — runs in executor)."""
     return hashlib.sha256(data).hexdigest()
+
+
+async def sha256_hex_process(data: bytes) -> str:
+    """One-shot SHA-256 via ProcessPoolExecutor — bypasses the GIL for large payloads."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(_process_pool, sha256_hex, data)
 
 
 def verify_checksum(expected: str, actual: str) -> None:

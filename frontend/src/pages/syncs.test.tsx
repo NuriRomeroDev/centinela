@@ -95,4 +95,28 @@ describe('Remediacion page', () => {
     expect(mockedApi.remediations).toHaveBeenCalledTimes(1)
     expect(screen.getByText('RETRY_JOB')).toBeInTheDocument()
   })
+
+  it('shows error state with refetch button when remediations query fails', async () => {
+    const user = userEvent.setup()
+    mockedApi.remediations.mockRejectedValueOnce(new Error('boom'))
+    mockedApi.remediations.mockResolvedValue(remediations)
+    renderWithClient(<Remediacion />)
+    const retryBtn = await screen.findByRole('button', { name: /Reintentar/ })
+    expect(screen.getByText(/No se pudieron cargar las remediaciones/)).toBeInTheDocument()
+    await user.click(retryBtn)
+    expect(await screen.findByText('corr-1')).toBeInTheDocument()
+  })
+})
+
+describe('Sincronizaciones error state', () => {
+  it('shows error state with refetch button when syncs query fails', async () => {
+    const user = userEvent.setup()
+    mockedApi.syncs.mockRejectedValueOnce(new Error('boom'))
+    mockedApi.syncs.mockResolvedValue(syncs)
+    renderWithClient(<Sincronizaciones />)
+    const retryBtn = await screen.findByRole('button', { name: /Reintentar/ })
+    expect(screen.getByText(/No se pudieron cargar las sincronizaciones/)).toBeInTheDocument()
+    await user.click(retryBtn)
+    expect(await screen.findByText('corr-1')).toBeInTheDocument()
+  })
 })

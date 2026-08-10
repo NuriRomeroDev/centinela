@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import type { LogEntry } from '../../types'
 
 const LEVEL_DOT: Record<string, string> = {
-  CRITICAL: 'var(--delta-down)',
-  ERROR: 'var(--delta-down)',
-  WARNING: 'var(--accent)',
+  CRITICAL: '#c0392b',
+  ERROR: '#c0392b',
+  WARNING: '#d4860a',
 }
 
 function formatTimestamp(iso: string): string {
