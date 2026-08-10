@@ -22,7 +22,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from app.api import dashboard, ingest
+from app.api import dashboard, ingest, logs
 from app.core.errors import AppError
 from app.core.settings import Settings, get_settings
 from app.db.engine import get_engine
@@ -123,6 +123,7 @@ def create_app(settings: Settings | None = None, *, engine: AsyncEngine | None =
     _register_exception_handlers(app)
     app.include_router(ingest.router, prefix="/api/v1")
     app.include_router(dashboard.router, prefix="/api/v1")
+    app.include_router(logs.router, prefix="/api/v1")
     return app
 
 

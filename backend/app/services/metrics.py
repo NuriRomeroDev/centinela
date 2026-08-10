@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ArchivoProcesado, LogError, Sincronizacion
 from app.models.enums import ArchivoEstado, NivelError, SyncEstado
+from app.services.serializers import log_item
 
 SYNC_ESTADOS: tuple[SyncEstado, ...] = tuple(SyncEstado)
 
@@ -98,16 +99,4 @@ async def recent_logs(session: AsyncSession, limit: int) -> list[dict]:
         .scalars()
         .all()
     )
-    return [_log_item(log) for log in rows]
-
-
-def _log_item(log: LogError) -> dict:
-    return {
-        "id": log.id,
-        "correlation_id": str(log.correlation_id),
-        "nivel_error": log.nivel_error.value if hasattr(log.nivel_error, "value") else str(log.nivel_error),
-        "codigo_error": log.codigo_error,
-        "mensaje": log.mensaje,
-        "servicio_responsable": log.servicio_responsable,
-        "creado_at": log.creado_at.isoformat(),
-    }
+    return [log_item(log) for log in rows]
