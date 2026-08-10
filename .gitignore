@@ -19,3 +19,4 @@ dist/
 # Environment
 .env
 .env.local
+frontend/coverage/
