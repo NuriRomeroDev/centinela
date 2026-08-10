@@ -67,11 +67,11 @@ Chain strategy: pending
 
 ## Batch 4: DevOps (PR 4)
 
-- [ ] **T4.1** docker-compose.yml — networks `frontend-net` + `db-net`; db (postgres:16-alpine, pg_isready healthcheck, named volume pgdata, env from .env) on db-net ONLY; frontend on frontend-net ONLY, no DATABASE_URL/DB env; backend bridges BOTH + depends_on db service_healthy + CORS_ORIGINS + retry envs; ports from .env (DO1, DO5). Deps: T3.10. Spec: devops-docker R1/R2/R5.
-- [ ] **T4.2** Dockerfiles — backend `python:3.12-slim`, non-root appuser, uvicorn CMD; frontend multi-stage (node:18-alpine `npm ci`+build → nginx:alpine serving dist/ with SPA fallback) + nginx.conf (DO3). Deps: T4.1. Spec: devops-docker R2.
-- [ ] **T4.3** Scripts — `scripts/up.sh` (build → up -d → wait db healthy → exec alembic upgrade head → optional SEED=1 → URLs; rerunnable, exit non-zero), `scripts/clean.sh` (`docker compose down -v`), `scripts/test.sh` (pytest --cov --cov-fail-under=80 + vitest run --coverage; exit non-zero on fail), all executable (DO2, T4). Deps: T4.2. Spec: devops-docker R3/R4.
-- [ ] **T4.4** Jenkinsfile — declarative `pipeline { agent any; stages: checkout → lint (flake8 + black --check + eslint) → unit tests (coverage ≥80 gates) → docker build }`, fail-fast, no secrets (DO4, T4). Deps: T4.3. Spec: ci-jenkins R1–R6.
-- [ ] **T4.5** README + CORS wiring — run instructions (up/clean/test, env copy), architecture overview, CORS_ORIGINS default to frontend origin; final .env.example sync (DO5). Deps: T4.4. Spec: devops-docker R5/R6.
+- [x] **T4.1** docker-compose.yml — networks `frontend-net` + `db-net`; db (postgres:16-alpine, pg_isready healthcheck, named volume pgdata, env from .env) on db-net ONLY; frontend on frontend-net ONLY, no DATABASE_URL/DB env; backend bridges BOTH + depends_on db service_healthy + CORS_ORIGINS + retry envs; ports from .env (DO1, DO5). Deps: T3.10. Spec: devops-docker R1/R2/R5.
+- [x] **T4.2** Dockerfiles — backend `python:3.12-slim`, non-root appuser, uvicorn CMD; frontend multi-stage (node:18-alpine `npm ci`+build → nginx:alpine serving dist/ with SPA fallback) + nginx.conf (DO3). Deps: T4.1. Spec: devops-docker R2.
+- [x] **T4.3** Scripts — `scripts/up.sh` (build → up -d → wait db healthy → exec alembic upgrade head → optional SEED=1 → URLs; rerunnable, exit non-zero), `scripts/clean.sh` (`docker compose down -v`), `scripts/test.sh` (pytest --cov --cov-fail-under=80 + vitest run --coverage; exit non-zero on fail), all executable (DO2, T4). Deps: T4.2. Spec: devops-docker R3/R4.
+- [x] **T4.4** Jenkinsfile — declarative `pipeline { agent any; stages: checkout → lint (flake8 + black --check + eslint) → unit tests (coverage ≥80 gates) → docker build }`, fail-fast, no secrets (DO4, T4). Deps: T4.3. Spec: ci-jenkins R1–R6.
+- [x] **T4.5** README + CORS wiring — run instructions (up/clean/test, env copy), architecture overview, CORS_ORIGINS default to frontend origin; final .env.example sync (DO5). Deps: T4.4. Spec: devops-docker R5/R6.
 
 ## Eval-Coverage Matrix
 
