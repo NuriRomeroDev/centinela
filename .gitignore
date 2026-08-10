@@ -20,3 +20,6 @@ dist/
 .env
 .env.local
 frontend/coverage/
+
+# SDD planning artifacts (not part of delivery)
+openspec/
