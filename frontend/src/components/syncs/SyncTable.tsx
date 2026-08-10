@@ -11,11 +11,16 @@ interface SyncTableProps {
 function fmtTime(iso: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso)
-  return d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false }) + ' UTC'
+  const hhmm = `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`
+  return `${hhmm} UTC`
 }
 
 function truncateHash(hash: string): string {
   return hash.length > 12 ? `${hash.slice(0, 6)}…${hash.slice(-4)}` : hash
+}
+
+function truncateCid(cid: string): string {
+  return cid.length > 20 ? `${cid.slice(0, 8)}…${cid.slice(-4)}` : cid
 }
 
 function estadoBadge(row: Sync) {
@@ -75,32 +80,39 @@ export default function SyncTable({ syncs, onRemediate }: SyncTableProps) {
         rowExpansionTemplate={filesGrid}
         emptyMessage="Sin sincronizaciones"
       >
-        <Column expander className="sync-expander" />
+        <Column expander style={{ width: '3rem', flexShrink: 0 }} />
         <Column
           field="correlation_id"
           header="Correlation ID"
-          body={(row: Sync) => <span className="sync-correlation mono">{row.correlation_id}</span>}
+          style={{ width: '11rem' }}
+          body={(row: Sync) => (
+            <span className="sync-correlation mono" title={row.correlation_id}>
+              {truncateCid(row.correlation_id)}
+            </span>
+          )}
         />
-        <Column field="estado" header="Estado" body={estadoBadge} />
-        <Column field="fecha_ejecucion" header="Fecha" />
+        <Column field="estado" header="Estado" style={{ width: '8rem' }} body={estadoBadge} />
+        <Column field="fecha_ejecucion" header="Fecha" style={{ width: '7rem' }} />
         <Column
           field="iniciado_at"
           header="Iniciado"
+          style={{ width: '7rem' }}
           body={(row: Sync) => <span className="sync-time mono">{fmtTime(row.iniciado_at)}</span>}
         />
         <Column
           field="finalizado_at"
           header="Finalizado"
+          style={{ width: '7rem' }}
           body={(row: Sync) => (
             <span className="sync-time mono">{fmtTime(row.finalizado_at)}</span>
           )}
         />
-        <Column field="usuario_origen" header="Usuario" />
-        <Column field="archivos_resumen" header="Archivos" />
+        <Column field="usuario_origen" header="Usuario" style={{ width: '8rem' }} />
+        <Column field="archivos_resumen" header="Archivos" style={{ minWidth: '10rem' }} />
         <Column
           header=""
+          style={{ width: '7rem', textAlign: 'right' }}
           body={(row: Sync) => retryAction(row, onRemediate)}
-          className="sync-actions"
         />
       </DataTable>
     </div>
