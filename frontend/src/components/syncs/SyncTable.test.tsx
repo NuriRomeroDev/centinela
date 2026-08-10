@@ -16,7 +16,7 @@ const syncs: Sync[] = [
     fecha_ejecucion: '2026-08-10',
     iniciado_at: '2026-08-10T09:00:00',
     finalizado_at: '2026-08-10T09:01:00',
-    usuario_origen: 'j.medina',
+    usuario_origen: 'n.romero',
     archivos_resumen: '3 total · 0 rechazados',
     archivos: [
       {
@@ -57,39 +57,37 @@ const syncs: Sync[] = [
 ]
 
 describe('SyncTable', () => {
-  it('renders the mock columns with badges and server-side archivos_resumen', () => {
+  it('renders columns, badges and archivos summary', () => {
     render(<SyncTable syncs={syncs} onRemediate={vi.fn()} />)
     expect(screen.getByText('Correlation ID')).toBeInTheDocument()
     expect(screen.getByText('Estado')).toBeInTheDocument()
     expect(screen.getByText('Fecha')).toBeInTheDocument()
-    expect(screen.getByText('Iniciado')).toBeInTheDocument()
-    expect(screen.getByText('Finalizado')).toBeInTheDocument()
     expect(screen.getByText('Usuario')).toBeInTheDocument()
     expect(screen.getByText('Archivos')).toBeInTheDocument()
     expect(screen.getByText('corr-1')).toBeInTheDocument()
-    expect(screen.getByText('3 total · 0 rechazados')).toBeInTheDocument()
-    const completedBadge = screen.getByText('completed')
+    expect(screen.getByText('3')).toBeInTheDocument()
+    const completedBadge = screen.getByText('Completado')
     expect(completedBadge).toHaveClass('status-badge--completed')
     expect(tokensCss).toContain('--status-completed-bg:')
   })
 
-  it('expands a row revealing the archivos grid (tipo, checksum, estado, registros)', async () => {
+  it('expands a row revealing the archivos panel', async () => {
     const user = userEvent.setup()
     render(<SyncTable syncs={syncs} onRemediate={vi.fn()} />)
-    const togglers = screen.getAllByRole('button')
-    await user.click(togglers[0])
+    const firstRow = screen.getByText('corr-1').closest('tr') as HTMLElement
+    await user.click(firstRow)
     expect(screen.getByText('Archivos procesados')).toBeInTheDocument()
     expect(screen.getByText('ventas_20260810.csv')).toBeInTheDocument()
     expect(screen.getByText('ventas')).toHaveClass('tipo-badge')
     expect(screen.getByText('ab12cd34')).toBeInTheDocument()
-    const accepted = screen.getAllByText('accepted')
+    const accepted = screen.getAllByText('Aceptado')
     expect(accepted.length).toBeGreaterThanOrEqual(2)
     expect(accepted[0]).toHaveClass('status-badge--accepted')
     expect(screen.getByText(/1[.,]?240/)).toBeInTheDocument()
-    expect(globalCss).toMatch(/\.sync-chevron\s*\{[^}]*transition:\s*transform\s+0\.15s/)
+    expect(globalCss).toMatch(/\.syncs-chevron\s*\{[^}]*transition:\s*transform\s+0\.18s/)
   })
 
-  it('offers a Reintentar action only on failed/rejected rows', async () => {
+  it('offers Reintentar only on failed/rejected rows', async () => {
     const user = userEvent.setup()
     const onRemediate = vi.fn()
     render(<SyncTable syncs={syncs} onRemediate={onRemediate} />)

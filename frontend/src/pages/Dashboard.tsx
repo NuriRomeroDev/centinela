@@ -74,7 +74,7 @@ export default function Dashboard() {
 
       <div className="dashboard-grid">
         <article className="card">
-          <h2 className="card-title">Throughput de lotes · últimos 7 días</h2>
+          <h2 className="card-title">Archivos procesados · últimos 7 días</h2>
           {throughputQuery.isPending ? (
             <WidgetLoading />
           ) : throughputQuery.isError ? (

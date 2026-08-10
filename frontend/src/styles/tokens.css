@@ -21,6 +21,7 @@
   --track-bg: oklch(92.5% 0.006 250);
   --tag-bg: oklch(94% 0.008 250);
   --sub-row-bg: oklch(96% 0.004 250);
+  --table-header-bg: oklch(95% 0.006 250);
   --toggle-track: oklch(92.5% 0.006 250);
   --avatar-bg: oklch(23% 0.045 255);
   --avatar-text: oklch(85% 0.04 250);
@@ -72,6 +73,7 @@
   --track-bg: oklch(24% 0.02 255);
   --tag-bg: oklch(26% 0.02 255);
   --sub-row-bg: oklch(22% 0.02 255);
+  --table-header-bg: oklch(23% 0.025 255);
   --toggle-track: oklch(24% 0.02 255);
   --avatar-bg: oklch(68% 0.14 250);
   --avatar-text: oklch(14% 0.02 255);

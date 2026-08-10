@@ -9,7 +9,7 @@ const remediations: Remediation[] = [
     sincronizacion_id: '10000000-0000-4000-8000-000000000001',
     correlation_id: 'corr-1',
     accion_ejecutada: 'RETRY_JOB',
-    ejecutado_por: 'j.medina',
+    ejecutado_por: 'n.romero',
     resultado: 'success',
     notas: 'Lote reprocesado sin errores',
     ejecutada_at: '2026-08-10T09:05:00',

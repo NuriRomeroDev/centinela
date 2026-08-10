@@ -25,7 +25,7 @@ const syncs: Sync[] = [
     fecha_ejecucion: '2026-08-10',
     iniciado_at: '2026-08-10T09:00:00',
     finalizado_at: null,
-    usuario_origen: 'j.medina',
+    usuario_origen: 'n.romero',
     archivos_resumen: '2 total · 2 rechazados',
     archivos: [
       {
@@ -45,7 +45,7 @@ const remediations: Remediation[] = [
     sincronizacion_id: syncs[0].id,
     correlation_id: 'corr-1',
     accion_ejecutada: 'RETRY_JOB',
-    ejecutado_por: 'j.medina',
+    ejecutado_por: 'n.romero',
     resultado: 'success',
     notas: 'Lote reprocesado',
     ejecutada_at: '2026-08-10T09:05:00',

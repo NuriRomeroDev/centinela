@@ -77,7 +77,7 @@ NOTAS_ACCIONES = (
     "Reencolado manual tras confirmar disponibilidad de servicio Data_Worker.",
     "Purga de registro duplicado detectado por control de checksum.",
 )
-ACTORES = ("j.medina", "a.rojas", "svc.autoheal")
+ACTORES = ("n.romero", "a.rojas", "svc.autoheal")
 
 
 @dataclass(frozen=True)
@@ -117,10 +117,15 @@ def _build_syncs() -> list[Sincronizacion]:
                 estado=SyncEstado(estado),
                 iniciado_at=_ts(i, 6, i * 4),
                 finalizado_at=finalizado,
-                usuario_origen="svc.batch.ops" if i % 2 == 0 else "j.medina",
+                usuario_origen="svc.batch.ops" if i % 2 == 0 else "n.romero",
             )
         )
     return syncs
+
+
+_REJECTED_SYNC_INDICES = {
+    i for i, estado in enumerate(SYNC_ESTADOS) if estado in ("rejected", "failed")
+}
 
 
 def _build_archivos(syncs: list[Sincronizacion]) -> list[ArchivoProcesado]:
@@ -128,7 +133,7 @@ def _build_archivos(syncs: list[Sincronizacion]) -> list[ArchivoProcesado]:
     for i, sync in enumerate(syncs):
         for j in range(3 + i % 3):
             tipo = TIPOS[j % 3]
-            rechazado = (i + j) % 5 == 0
+            rechazado = (i + j) % 5 == 0 or (i in _REJECTED_SYNC_INDICES and j == 0)
             registros = 1200 + i * 340 + j * 88
             d = _ANCHOR - __import__("datetime").timedelta(days=i)
             archivos.append(

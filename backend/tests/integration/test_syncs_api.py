@@ -170,7 +170,7 @@ async def test_remediations_post_valid_returns_201_and_persists(api_client, db_s
         json={
             "sincronizacion_id": str(sync.id),
             "accion_ejecutada": "RETRY_JOB",
-            "ejecutado_por": "j.medina",
+            "ejecutado_por": "n.romero",
             "resultado": "success",
             "notas": "reintento manual tras revisión",
         },
@@ -178,7 +178,7 @@ async def test_remediations_post_valid_returns_201_and_persists(api_client, db_s
     assert response.status_code == 201
     created = response.json()
     assert created["accion_ejecutada"] == "RETRY_JOB"
-    assert created["ejecutado_por"] == "j.medina"
+    assert created["ejecutado_por"] == "n.romero"
 
     rows = (await api_client.get(REMEDIATIONS_URL)).json()
     assert any(row["id"] == created["id"] for row in rows)
@@ -193,7 +193,7 @@ async def test_remediations_post_unknown_accion_returns_422_no_row(api_client, d
         json={
             "sincronizacion_id": str(sync.id),
             "accion_ejecutada": "UNKNOWN_ACTION",
-            "ejecutado_por": "j.medina",
+            "ejecutado_por": "n.romero",
             "resultado": "success",
         },
     )
@@ -224,7 +224,7 @@ async def test_remediations_post_unknown_sync_returns_404(api_client, db_session
         json={
             "sincronizacion_id": str(uuid.uuid4()),
             "accion_ejecutada": "RETRY_JOB",
-            "ejecutado_por": "j.medina",
+            "ejecutado_por": "n.romero",
             "resultado": "success",
         },
     )

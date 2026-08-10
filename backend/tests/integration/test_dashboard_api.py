@@ -37,7 +37,7 @@ async def test_metrics_on_seeded_data_matches_expected_aggregates(api_client, db
     body = response.json()
     assert body["sincronizaciones_activas"] == 1  # seed has exactly one running sync
     assert body["completadas_hoy"] == 1  # seed anchor is today (2026-08-10), offset 0 = completed
-    assert body["archivos_rechazados"] == 6  # (i + j) % 5 == 0 across 31 files
+    assert body["archivos_rechazados"] == 8  # (i + j) % 5 == 0 + rejected/failed syncs force j==0
     assert body["tasa_errores_criticos"] == "37.5"  # 3 CRITICAL / 8 logs
 
 

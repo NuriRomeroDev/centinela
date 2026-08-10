@@ -208,7 +208,7 @@ describe('Dashboard metrics null data branch (line 72)', () => {
   it('renders nothing in KPI grid when metrics data is undefined', async () => {
     mockedApi.dashboardMetrics.mockResolvedValue(undefined as never)
     renderDashboard()
-    await screen.findByText('Throughput de lotes · últimos 7 días')
+    await screen.findByText('Archivos procesados · últimos 7 días')
     expect(document.querySelector('.kpi-card')).toBeNull()
   })
 })
